@@ -256,13 +256,13 @@ export async function fetchHfRows(
   }
 
   const features = (data.features || []).map((f: any) => ({
-    name: f.feature_idx || f.name,
+    name: String(f.name || f.feature_idx || ''),
     type: typeof f.type === 'string' ? f.type : (f.type?.dtype || f.type?._type || 'string')
   }));
 
   const candidateNames = ['text', 'sentence', 'review', 'instruction', 'prompt', 'content', 'input', 'question', 'body'];
   const candidateTextColumns = features
-    .filter((f: any) => candidateNames.includes(f.name.toLowerCase()) || f.type === 'string')
+    .filter((f: any) => candidateNames.includes(String(f.name || '').toLowerCase()) || f.type === 'string')
     .map((f: any) => f.name);
 
   return {
