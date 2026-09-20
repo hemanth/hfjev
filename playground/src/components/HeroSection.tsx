@@ -8,57 +8,44 @@ interface HeroSectionProps {
 
 export const HeroSection: React.FC<HeroSectionProps> = ({ onScrollToStudio, datasetCount }) => {
   const [copied, setCopied] = useState(false);
-  const [activeCodeTab, setActiveCodeTab] = useState<'fetch' | 'curl' | 'sdk'>('fetch');
+  const [activeCodeTab, setActiveCodeTab] = useState<'ts' | 'py' | 'cli'>('ts');
 
-  const fetchCode = `// Zero-dependency native fetch to TypeSafe System One
-const res = await fetch("https://api.typesafe.ai/v1/systemone", {
-  method: "POST",
-  headers: {
-    "Authorization": \`Bearer \${process.env.TYPESAFE_API_KEY}\`,
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    model: "jev-latest",
-    state: hfRow.text,
-    questions: {
-      sentiment: { instructions: "Tone?", criteria: { pos: null, neg: null } },
-      is_urgent: { instructions: "Urgent?" },
-      quality: { instructions: "Depth?", criteria: ["Low", "High"] }
-    }
-  })
-});
-const { answers } = await res.json();`;
+  const tsCode = `import hfjev from 'hfjev';
 
-  const curlCode = `curl -s -X POST https://api.typesafe.ai/v1/systemone \\
-  -H "Authorization: Bearer $TYPESAFE_API_KEY" \\
-  -H "Content-Type: application/json" \\
-  -d '{
-    "model": "jev-latest",
-    "state": "The cinematography was breathtaking...",
-    "questions": {
-      "sentiment": { "instructions": "Tone?", "criteria": { "pos": null, "neg": null } },
-      "is_urgent": { "instructions": "Urgent?" },
-      "quality": { "instructions": "Depth?", "criteria": ["Low", "High"] }
-    }
-  }'`;
+// Load dataset with auto-adapted rubrics
+const dataset = await hfjev('cornell-movie-review-data/rotten_tomatoes');
+const results = await dataset.classify({ limit: 10 });
 
-  const sdkCode = `import { TypeSafeClient, choice, noul, score } from "@typesafe-ai/sdk";
+for (const row of results) {
+  console.log(row.text);
+  console.log(row.answers);
+  // { sentiment: { choice: 'positive', confidence: 0.94 },
+  //   recommendation: { choice: 'must_watch', confidence: 0.91 }, ... }
+}`;
 
-const client = new TypeSafeClient();
-const { answers } = await client.systemOne({
-  state: hfRow.text,
-  questions: {
-    sentiment: choice("Tone?", { pos: null, neg: null }),
-    is_urgent: noul("Urgent?"),
-    quality: score("Depth?", ["Low", "High"])
-  }
-});`;
+  const pyCode = `import hfjev
+
+# Load dataset with auto-adapted rubrics
+dataset = hfjev('cornell-movie-review-data/rotten_tomatoes')
+results = dataset.classify(limit=10)
+
+for row in results:
+    print(row['text'])
+    print(row['answers'])
+    # {'sentiment': {'choice': 'positive', 'confidence': 0.94},
+    #  'recommendation': {'choice': 'must_watch', 'confidence': 0.91}, ...}`;
+
+  const cliCode = `# Node.js CLI
+npx hfjev cornell-movie-review-data/rotten_tomatoes --limit 10
+
+# Python CLI
+hfjev cornell-movie-review-data/rotten_tomatoes --limit 10`;
 
   const getActiveCode = () => {
     switch (activeCodeTab) {
-      case 'curl': return curlCode;
-      case 'sdk': return sdkCode;
-      default: return fetchCode;
+      case 'py': return pyCode;
+      case 'cli': return cliCode;
+      default: return tsCode;
     }
   };
 
@@ -142,34 +129,34 @@ const { answers } = await client.systemOne({
                   <div className="w-2.5 h-2.5 rounded-full bg-ink-200"></div>
                 </div>
                 <span className="text-[11px] font-mono text-ink-500 ml-1">
-                  {activeCodeTab === 'fetch' ? 'evaluate.ts' : activeCodeTab === 'curl' ? 'request.sh' : 'typesafe.ts'}
+                  {activeCodeTab === 'ts' ? 'evaluate.ts' : activeCodeTab === 'py' ? 'evaluate.py' : 'terminal.sh'}
                 </span>
               </div>
 
               <div className="flex items-center gap-1">
                 <button
-                  onClick={() => setActiveCodeTab('fetch')}
+                  onClick={() => setActiveCodeTab('ts')}
                   className={`px-2 py-0.5 rounded text-[10px] font-mono transition ${
-                    activeCodeTab === 'fetch' ? 'bg-ink-100 text-ink-900 font-semibold' : 'text-ink-500 hover:text-ink-800'
+                    activeCodeTab === 'ts' ? 'bg-ink-100 text-ink-900 font-semibold' : 'text-ink-500 hover:text-ink-800'
                   }`}
                 >
-                  fetch
+                  TypeScript
                 </button>
                 <button
-                  onClick={() => setActiveCodeTab('curl')}
+                  onClick={() => setActiveCodeTab('py')}
                   className={`px-2 py-0.5 rounded text-[10px] font-mono transition ${
-                    activeCodeTab === 'curl' ? 'bg-ink-100 text-ink-900 font-semibold' : 'text-ink-500 hover:text-ink-800'
+                    activeCodeTab === 'py' ? 'bg-ink-100 text-ink-900 font-semibold' : 'text-ink-500 hover:text-ink-800'
                   }`}
                 >
-                  cURL
+                  Python
                 </button>
                 <button
-                  onClick={() => setActiveCodeTab('sdk')}
+                  onClick={() => setActiveCodeTab('cli')}
                   className={`px-2 py-0.5 rounded text-[10px] font-mono transition ${
-                    activeCodeTab === 'sdk' ? 'bg-ink-100 text-ink-900 font-semibold' : 'text-ink-500 hover:text-ink-800'
+                    activeCodeTab === 'cli' ? 'bg-ink-100 text-ink-900 font-semibold' : 'text-ink-500 hover:text-ink-800'
                   }`}
                 >
-                  SDK
+                  CLI
                 </button>
                 <button
                   onClick={handleCopyCode}
@@ -183,59 +170,39 @@ const { answers } = await client.systemOne({
             </div>
 
             <div className="rounded-xl bg-ink-900 p-3.5 font-mono text-[11px] leading-relaxed text-ink-100 overflow-x-auto max-h-64">
-              {activeCodeTab === 'fetch' && (
+              {activeCodeTab === 'ts' && (
                 <pre className="text-ink-100">
-                  <span className="text-ink-400">// Zero-dependency native fetch to TypeSafe System One</span>{'\n'}
-                  <span className="text-blue-400">const</span> res = <span className="text-purple-400">await</span> <span className="text-yellow-300">fetch</span>(<span className="text-amber-300">"https://api.typesafe.ai/v1/systemone"</span>, &#123;{'\n'}
-                  {'  '}method: <span className="text-amber-300">"POST"</span>,{'\n'}
-                  {'  '}headers: &#123;{'\n'}
-                  {'    '}<span className="text-amber-300">"Authorization"</span>: <span className="text-amber-300">`Bearer $&#123;process.env.TYPESAFE_API_KEY&#125;`</span>,{'\n'}
-                  {'    '}<span className="text-amber-300">"Content-Type"</span>: <span className="text-amber-300">"application/json"</span>{'\n'}
-                  {'  '}&#125;,{'\n'}
-                  {'  '}body: JSON.<span className="text-yellow-300">stringify</span>(&#123;{'\n'}
-                  {'    '}model: <span className="text-amber-300">"jev-latest"</span>,{'\n'}
-                  {'    '}state: hfRow.<span className="text-sky-300">text</span>,{'\n'}
-                  {'    '}questions: &#123;{'\n'}
-                  {'      '}sentiment: &#123; instructions: <span className="text-amber-300">"Tone?"</span>, criteria: &#123; pos: <span className="text-red-400">null</span>, neg: <span className="text-red-400">null</span> &#125; &#125;,{'\n'}
-                  {'      '}is_urgent: &#123; instructions: <span className="text-amber-300">"Urgent?"</span> &#125;,{'\n'}
-                  {'      '}quality: &#123; instructions: <span className="text-amber-300">"Depth?"</span>, criteria: [<span className="text-amber-300">"Low"</span>, <span className="text-amber-300">"High"</span>] &#125;{'\n'}
-                  {'    '}&#125;{'\n'}
-                  {'  '}&#125;){'\n'}
-                  &#125;);{'\n'}
-                  <span className="text-blue-400">const</span> &#123; answers &#125; = <span className="text-purple-400">await</span> res.<span className="text-yellow-300">json</span>();
+                  <span className="text-purple-400">import</span> hfjev <span className="text-purple-400">from</span> <span className="text-amber-300">&#39;hfjev&#39;</span>;{'\n\n'}
+                  <span className="text-ink-400">// Load dataset &amp; auto-adapt rubrics</span>{'\n'}
+                  <span className="text-blue-400">const</span> dataset = <span className="text-purple-400">await</span> <span className="text-yellow-300">hfjev</span>(<span className="text-amber-300">&#39;cornell-movie-review-data/rotten_tomatoes&#39;</span>);{'\n'}
+                  <span className="text-blue-400">const</span> results = <span className="text-purple-400">await</span> dataset.<span className="text-yellow-300">classify</span>(&#123; limit: <span className="text-emerald-400">10</span> &#125;);{'\n\n'}
+                  <span className="text-purple-400">for</span> (<span className="text-blue-400">const</span> row <span className="text-purple-400">of</span> results) &#123;{'\n'}
+                  {'  '}console.<span className="text-yellow-300">log</span>(row.<span className="text-sky-300">text</span>);{'\n'}
+                  {'  '}console.<span className="text-yellow-300">log</span>(row.<span className="text-sky-300">answers</span>);{'\n'}
+                  {'  '}<span className="text-ink-400">// &#123; sentiment: &#123; choice: &#39;positive&#39;, confidence: 0.94 &#125;, ... &#125;</span>{'\n'}
+                  &#125;
                 </pre>
               )}
 
-              {activeCodeTab === 'curl' && (
+              {activeCodeTab === 'py' && (
                 <pre className="text-ink-100">
-                  <span className="text-yellow-300">curl</span> -s -X POST https://api.typesafe.ai/v1/systemone \{'\n'}
-                  {'  '}-H <span className="text-amber-300">"Authorization: Bearer $TYPESAFE_API_KEY"</span> \{'\n'}
-                  {'  '}-H <span className="text-amber-300">"Content-Type: application/json"</span> \{'\n'}
-                  {'  '}-d <span className="text-emerald-300">&#39;&#123;</span>{'\n'}
-                  {'    '}<span className="text-sky-300">"model"</span>: <span className="text-amber-300">"jev-latest"</span>,{'\n'}
-                  {'    '}<span className="text-sky-300">"state"</span>: <span className="text-amber-300">"The cinematography was breathtaking..."</span>,{'\n'}
-                  {'    '}<span className="text-sky-300">"questions"</span>: &#123;{'\n'}
-                  {'      '}<span className="text-sky-300">"sentiment"</span>: &#123; <span className="text-sky-300">"instructions"</span>: <span className="text-amber-300">"Tone?"</span>, <span className="text-sky-300">"criteria"</span>: &#123; <span className="text-sky-300">"pos"</span>: <span className="text-red-400">null</span> &#125; &#125;,{'\n'}
-                  {'      '}<span className="text-sky-300">"is_urgent"</span>: &#123; <span className="text-sky-300">"instructions"</span>: <span className="text-amber-300">"Urgent?"</span> &#125;,{'\n'}
-                  {'      '}<span className="text-sky-300">"quality"</span>: &#123; <span className="text-sky-300">"instructions"</span>: <span className="text-amber-300">"Depth?"</span>, <span className="text-sky-300">"criteria"</span>: [<span className="text-amber-300">"Low"</span>, <span className="text-amber-300">"High"</span>] &#125;{'\n'}
-                  {'    '}&#125;{'\n'}
-                  {'  '}<span className="text-emerald-300">&#125;&#39;</span>
+                  <span className="text-purple-400">import</span> hfjev{'\n\n'}
+                  <span className="text-ink-400"># Load dataset &amp; auto-adapt rubrics</span>{'\n'}
+                  dataset = hfjev.<span className="text-yellow-300">hfjev</span>(<span className="text-amber-300">&#39;cornell-movie-review-data/rotten_tomatoes&#39;</span>){'\n'}
+                  results = dataset.<span className="text-yellow-300">classify</span>(limit=<span className="text-emerald-400">10</span>){'\n\n'}
+                  <span className="text-purple-400">for</span> row <span className="text-purple-400">in</span> results:{'\n'}
+                  {'    '}<span className="text-yellow-300">print</span>(row[<span className="text-amber-300">&#39;text&#39;</span>]){'\n'}
+                  {'    '}<span className="text-yellow-300">print</span>(row[<span className="text-amber-300">&#39;answers&#39;</span>]){'\n'}
+                  {'    '}<span className="text-ink-400"># &#123;&#39;sentiment&#39;: &#123;&#39;choice&#39;: &#39;positive&#39;, &#39;confidence&#39;: 0.94&#125;, ...&#125;</span>
                 </pre>
               )}
 
-              {activeCodeTab === 'sdk' && (
-                <pre className="text-emerald-400">
-                  <span className="text-purple-400">import</span> &#123; TypeSafeClient, choice, noul, score &#125; <span className="text-purple-400">from</span> <span className="text-amber-300">"@typesafe-ai/sdk"</span>;{'\n\n'}
-                  <span className="text-ink-400">// Evaluate in single parallel System One call:</span>{'\n'}
-                  <span className="text-blue-400">const</span> client = <span className="text-blue-400">new</span> <span className="text-yellow-300">TypeSafeClient</span>();{'\n'}
-                  <span className="text-blue-400">const</span> &#123; answers &#125; = <span className="text-purple-400">await</span> client.<span className="text-yellow-300">systemOne</span>(&#123;{'\n'}
-                  {'  '}state: hfRow.<span className="text-sky-300">text</span>,{'\n'}
-                  {'  '}questions: &#123;{'\n'}
-                  {'    '}sentiment: <span className="text-yellow-300">choice</span>(<span className="text-amber-300">"Tone?"</span>, &#123; pos: <span className="text-red-400">null</span>, neg: <span className="text-red-400">null</span> &#125;),{'\n'}
-                  {'    '}is_urgent: <span className="text-yellow-300">noul</span>(<span className="text-amber-300">"Urgent?"</span>),{'\n'}
-                  {'    '}quality: <span className="text-yellow-300">score</span>(<span className="text-amber-300">"Depth"</span>, [<span className="text-amber-300">"Low"</span>, <span className="text-amber-300">"High"</span>]){'\n'}
-                  {'  '}&#125;{'\n'}
-                  &#125;);
+              {activeCodeTab === 'cli' && (
+                <pre className="text-ink-100">
+                  <span className="text-ink-400"># Node.js CLI (npm install -g hfjev or npx)</span>{'\n'}
+                  <span className="text-yellow-300">npx</span> hfjev cornell-movie-review-data/rotten_tomatoes --limit <span className="text-emerald-400">10</span>{'\n\n'}
+                  <span className="text-ink-400"># Python CLI (pip install hfjev)</span>{'\n'}
+                  <span className="text-yellow-300">hfjev</span> cornell-movie-review-data/rotten_tomatoes --limit <span className="text-emerald-400">10</span>
                 </pre>
               )}
             </div>

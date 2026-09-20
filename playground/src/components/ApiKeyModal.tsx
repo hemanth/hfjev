@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Key, Check, AlertCircle, ExternalLink, X, ShieldCheck } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Key, Check, AlertCircle, ExternalLink, X, ShieldCheck, Eye, EyeOff } from 'lucide-react';
 import { PastelBadge } from './PastelBadge';
 import { evaluateRow } from '../services/api';
 
@@ -29,9 +29,20 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
   const [inputKey, setInputKey] = useState(apiKey);
   const [inputHfToken, setInputHfToken] = useState(hfToken);
   const [activeTab, setActiveTab] = useState<'typesafe' | 'huggingface'>(initialTab);
+  const [showKey, setShowKey] = useState(false);
+  const [showHfToken, setShowHfToken] = useState(false);
   const [saved, setSaved] = useState(false);
   const [testing, setTesting] = useState(false);
   const [testResult, setTestResult] = useState<{ ok: boolean; message: string } | null>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      setInputKey(apiKey);
+      setInputHfToken(hfToken);
+      setActiveTab(initialTab);
+      setTestResult(null);
+    }
+  }, [isOpen, apiKey, hfToken, initialTab]);
 
   if (!isOpen) return null;
 
@@ -60,7 +71,7 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
       });
 
       if (data.answers?.ping) {
-        setTestResult({ ok: true, message: `Connected! Model: ${data.model}` });
+        setTestResult({ ok: true, message: `Connected! Model: ${data.model} (${data.latencyMs}ms)` });
       } else {
         setTestResult({ ok: false, message: 'No response from model' });
       }
@@ -72,47 +83,55 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/30 backdrop-blur-sm p-4">
-      <div className="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-soft-lg border border-ink-100">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/40 backdrop-blur-sm p-4 animate-fadeIn">
+      <div className="relative w-full max-w-lg rounded-2xl bg-white p-6 shadow-soft-lg border border-ink-100">
         <button
           onClick={onClose}
           className="absolute right-4 top-4 rounded-lg p-1.5 text-ink-400 hover:bg-ink-100 hover:text-ink-700 transition"
+          aria-label="Close"
         >
           <X size={18} />
         </button>
 
         <div className="flex items-center gap-3 mb-4">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-pastel-lavender text-pastel-lavender-text">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-pastel-lavender text-pastel-lavender-text shadow-soft-sm">
             <Key size={20} />
           </div>
           <div>
-            <h3 className="text-base font-semibold text-ink-900">API &amp; Access Tokens</h3>
-            <p className="text-xs text-ink-500">Configure TypeSafe System One &amp; Hugging Face credentials</p>
+            <h3 className="text-base font-bold text-ink-900">API Keys &amp; Credentials</h3>
+            <p className="text-xs text-ink-500">Stored locally in your browser (localStorage). Never sent to third parties.</p>
           </div>
         </div>
 
-        {/* Tab switch */}
-        <div className="flex border-b border-ink-100 mb-4 text-xs font-medium">
+        {/* Tab switcher */}
+        <div className="flex border-b border-ink-100 mb-4 text-xs font-mono">
           <button
-            onClick={() => setActiveTab('typesafe')}
-            className={`pb-2 px-3 border-b-2 transition ${
+            onClick={() => {
+              setActiveTab('typesafe');
+              setTestResult(null);
+            }}
+            className={`pb-2.5 px-3 border-b-2 transition flex items-center gap-2 ${
               activeTab === 'typesafe'
                 ? 'border-[#7C66DC] text-[#4D3DB5] font-semibold'
                 : 'border-transparent text-ink-500 hover:text-ink-800'
             }`}
           >
-            TypeSafe System One
+            <span>TypeSafe Jev API Key</span>
+            <span className={`w-2 h-2 rounded-full ${inputKey ? 'bg-emerald-500' : 'bg-ink-300'}`}></span>
           </button>
           <button
-            onClick={() => setActiveTab('huggingface')}
-            className={`pb-2 px-3 border-b-2 transition flex items-center gap-1.5 ${
+            onClick={() => {
+              setActiveTab('huggingface');
+              setTestResult(null);
+            }}
+            className={`pb-2.5 px-3 border-b-2 transition flex items-center gap-2 ${
               activeTab === 'huggingface'
                 ? 'border-peach-600 text-peach-800 font-semibold'
                 : 'border-transparent text-ink-500 hover:text-ink-800'
             }`}
           >
             <span>Hugging Face Token</span>
-            {inputHfToken ? <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> : null}
+            <span className={`w-2 h-2 rounded-full ${inputHfToken ? 'bg-emerald-500' : 'bg-ink-300'}`}></span>
           </button>
         </div>
 
@@ -120,35 +139,58 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
           {activeTab === 'typesafe' ? (
             <>
               <div>
-                <label className="block text-xs font-medium text-ink-700 mb-1">
-                  TypeSafe API Key
-                </label>
-                <input
-                  type="password"
-                  value={inputKey}
-                  onChange={(e) => setInputKey(e.target.value)}
-                  placeholder="ts_live_..."
-                  className="w-full rounded-xl border border-ink-200 px-3 py-2 text-sm font-mono focus:border-[#7C66DC] focus:ring-2 focus:ring-[#EEF0FD] focus:outline-none transition"
-                />
-                <p className="mt-1.5 text-[11px] text-ink-500 leading-relaxed">
-                  Stored locally in your browser and used securely to query <code className="bg-ink-100 px-1 py-0.5 rounded text-[10px]">api.typesafe.ai/v1/systemone</code>.
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-xs font-semibold text-ink-800">
+                    TypeSafe System One API Key
+                  </label>
+                  <a
+                    href="https://typesafe.ai"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1 text-[11px] font-medium text-[#4D3DB5] hover:underline"
+                  >
+                    <span>Get Key</span>
+                    <ExternalLink size={11} />
+                  </a>
+                </div>
+                <div className="relative">
+                  <input
+                    type={showKey ? 'text' : 'password'}
+                    value={inputKey}
+                    onChange={(e) => setInputKey(e.target.value)}
+                    placeholder="ts_live_..."
+                    className="w-full rounded-xl border border-ink-200 pl-3 pr-10 py-2.5 text-xs font-mono focus:border-[#7C66DC] focus:ring-2 focus:ring-[#EEF0FD] focus:outline-none transition"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowKey(!showKey)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 hover:text-ink-700"
+                  >
+                    {showKey ? <EyeOff size={15} /> : <Eye size={15} />}
+                  </button>
+                </div>
+                <p className="mt-1.5 text-[11px] text-ink-500 leading-relaxed font-sans">
+                  Direct requests are sent with Authorization Bearer header directly to <code className="bg-ink-100 px-1 py-0.5 rounded text-[10px] font-mono">api.typesafe.ai/v1/systemone</code>.
                 </p>
               </div>
 
-              <div className="rounded-xl bg-pastel-lavender/50 border border-pastel-lavender-border p-3">
-                <div className="flex items-center justify-between">
+              {/* Simulation Mode Toggle */}
+              <div className="rounded-xl bg-pastel-lavender/50 border border-pastel-lavender-border p-3.5">
+                <div className="flex items-center justify-between gap-3">
                   <div>
-                    <div className="text-xs font-medium text-ink-800">Calibrated Simulation Mode</div>
-                    <div className="text-[11px] text-ink-600">Test immediately without consuming API credits</div>
+                    <div className="text-xs font-semibold text-ink-900">In-Browser Calibrated Simulation</div>
+                    <div className="text-[11px] text-ink-600 mt-0.5">
+                      Deterministic Jev evaluation running 100% client-side with calibrated confidence distributions (no API credits used).
+                    </div>
                   </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
+                  <label className="relative inline-flex items-center cursor-pointer shrink-0">
                     <input
                       type="checkbox"
                       checked={isSimulated}
                       onChange={(e) => onToggleSimulated(e.target.checked)}
                       className="sr-only peer"
                     />
-                    <div className="w-9 h-5 bg-ink-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-ink-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#7C66DC]"></div>
+                    <div className="w-10 h-5 bg-ink-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-ink-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#7C66DC]"></div>
                   </label>
                 </div>
               </div>
@@ -169,57 +211,62 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
           ) : (
             <>
               <div>
-                <label className="block text-xs font-medium text-ink-700 mb-1">
-                  Hugging Face User Access Token
-                </label>
-                <input
-                  type="password"
-                  value={inputHfToken}
-                  onChange={(e) => setInputHfToken(e.target.value)}
-                  placeholder="hf_..."
-                  className="w-full rounded-xl border border-ink-200 px-3 py-2 text-sm font-mono focus:border-peach-600 focus:ring-2 focus:ring-peach-100 focus:outline-none transition"
-                />
-                <p className="mt-1.5 text-[11px] text-ink-500 leading-relaxed">
-                  Required for accessing <strong>gated datasets</strong> (such as LLaMA or Gemma) or private repositories.
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-xs font-semibold text-ink-800">
+                    Hugging Face User Access Token (Read)
+                  </label>
+                  <a
+                    href="https://huggingface.co/settings/tokens"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1 text-[11px] font-medium text-peach-700 hover:underline"
+                  >
+                    <span>Generate Token</span>
+                    <ExternalLink size={11} />
+                  </a>
+                </div>
+                <div className="relative">
+                  <input
+                    type={showHfToken ? 'text' : 'password'}
+                    value={inputHfToken}
+                    onChange={(e) => setInputHfToken(e.target.value)}
+                    placeholder="hf_..."
+                    className="w-full rounded-xl border border-ink-200 pl-3 pr-10 py-2.5 text-xs font-mono focus:border-peach-600 focus:ring-2 focus:ring-peach-100 focus:outline-none transition"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowHfToken(!showHfToken)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 hover:text-ink-700"
+                  >
+                    {showHfToken ? <EyeOff size={15} /> : <Eye size={15} />}
+                  </button>
+                </div>
+                <p className="mt-1.5 text-[11px] text-ink-500 leading-relaxed font-sans">
+                  Passed to <code className="bg-ink-100 px-1 py-0.5 rounded text-[10px] font-mono">datasets-server.huggingface.co</code> for authenticated requests.
                 </p>
               </div>
 
-              <div className="rounded-xl bg-peach-50 border border-peach-200 p-3 text-xs text-peach-900 leading-relaxed">
-                <div className="font-semibold mb-1 flex items-center gap-1.5">
-                  <ShieldCheck size={14} className="text-peach-700" />
-                  <span>Why is this needed?</span>
+              <div className="rounded-xl bg-peach-50 border border-peach-200 p-3.5 text-xs text-peach-900 leading-relaxed">
+                <div className="font-semibold mb-1 flex items-center gap-1.5 text-peach-800">
+                  <ShieldCheck size={15} className="text-peach-700" />
+                  <span>When is a Hugging Face Token required?</span>
                 </div>
-                Certain datasets on Hugging Face require user agreements or gated permissions. Passing your token forwards an authenticated bearer header to the Hugging Face Datasets Server.
+                <p className="text-[11px] text-ink-700 leading-relaxed">
+                  A token is required when importing <strong>gated datasets</strong> (such as LLaMA, Gemma, or Mistral community datasets) or private organization repositories, or to bypass anonymous Hugging Face rate limits.
+                </p>
               </div>
             </>
           )}
 
           <div className="flex items-center justify-between pt-3 border-t border-ink-100">
-            {activeTab === 'typesafe' ? (
-              <a
-                href="https://typesafe.ai"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1 text-xs text-ink-600 hover:text-ink-900 transition"
-              >
-                <span>Get TypeSafe Key</span>
-                <ExternalLink size={12} />
-              </a>
-            ) : (
-              <a
-                href="https://huggingface.co/settings/tokens"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1 text-xs text-peach-700 hover:text-peach-900 font-medium transition"
-              >
-                <span>Get Hugging Face Token</span>
-                <ExternalLink size={12} />
-              </a>
-            )}
+            <div className="text-[11px] text-ink-500 font-mono">
+              {saved ? 'Changes saved locally.' : 'Saved to browser localStorage.'}
+            </div>
 
             <div className="flex gap-2">
               {activeTab === 'typesafe' && inputKey && (
                 <button
+                  type="button"
                   onClick={handleTest}
                   disabled={testing}
                   className="rounded-xl border border-ink-200 px-3 py-1.5 text-xs font-medium text-ink-700 hover:bg-ink-50 transition disabled:opacity-50"
@@ -228,11 +275,12 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
                 </button>
               )}
               <button
+                type="button"
                 onClick={handleSave}
-                className="inline-flex items-center gap-1.5 rounded-xl bg-[#4D3DB5] hover:bg-[#3D2FA0] px-4 py-1.5 text-xs font-medium text-white transition shadow-soft-sm"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-ink-900 hover:bg-ink-800 px-4 py-1.5 text-xs font-semibold text-white transition shadow-soft-sm"
               >
-                {saved ? <Check size={14} /> : null}
-                {saved ? 'Saved!' : 'Save Credentials'}
+                {saved ? <Check size={14} className="text-emerald-400" /> : null}
+                <span>{saved ? 'Saved!' : 'Save Credentials'}</span>
               </button>
             </div>
           </div>

@@ -13,10 +13,47 @@ import { ExportModal } from './components/ExportModal';
 import { ApiKeyModal } from './components/ApiKeyModal';
 import { PRESET_DATASETS, PRESET_DIMENSION_PACKS, getDynamicDimensionsForDataset } from './data/presets';
 import { DatasetRow, Dimension, DimensionPack, RowEvaluation } from './types';
-import { Table, BarChart2, AlertCircle, Sparkles, Wand2, X } from 'lucide-react';
+import { Table, BarChart2, AlertCircle, Sparkles, Wand2, X, Database, Sliders, RefreshCw } from 'lucide-react';
 import { fetchHfRows, evaluateRow } from './services/api';
 
 export function App() {
+  // View routing ('docs' | 'studio') based on URL hash
+  const getInitialView = (): 'docs' | 'studio' => {
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash.toLowerCase();
+      if (hash.includes('studio')) return 'studio';
+    }
+    return 'docs';
+  };
+
+  const [currentView, setCurrentView] = useState<'docs' | 'studio'>(getInitialView);
+  const [isDatasetPickerOpen, setIsDatasetPickerOpen] = useState(false);
+  const [isDimensionManagerOpen, setIsDimensionManagerOpen] = useState(false);
+
+  // Sync hash changes with view state
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.toLowerCase();
+      if (hash.includes('studio')) {
+        setCurrentView('studio');
+      } else {
+        setCurrentView('docs');
+      }
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
+  const handleViewChange = (view: 'docs' | 'studio') => {
+    setCurrentView(view);
+    if (view === 'studio') {
+      window.location.hash = '#/studio';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      window.location.hash = '#/';
+    }
+  };
+
   // API Key & Simulation state
   const [apiKey, setApiKey] = useState<string>(() => localStorage.getItem('typesafe_api_key') || '');
   const [hfToken, setHfToken] = useState<string>(() => localStorage.getItem('hf_token') || '');
@@ -408,96 +445,300 @@ export function App() {
 
   return (
     <div className="min-h-screen bg-[#F8F9FA] text-[#191E28] pb-16 font-sans">
-      {/* Top Header */}
+      {/* Top Header with Navigation & API Key Status */}
       <Header
+        currentView={currentView}
+        onChangeView={handleViewChange}
         apiKey={apiKey}
         isSimulated={isSimulated}
         hfToken={hfToken}
-        onOpenApiKeyModal={() => {
-          setApiKeyModalTab('typesafe');
+        onOpenApiKeyModal={(tab) => {
+          setApiKeyModalTab(tab || 'typesafe');
           setIsApiKeyModalOpen(true);
         }}
         activeDatasetName={selectedDataset}
         totalEvaluated={completedCount}
       />
 
-      {/* Hero Landing Page Section (Jevish Style) */}
-      <HeroSection
-        onScrollToStudio={() => {
-          document.getElementById('studio')?.scrollIntoView({ behavior: 'smooth' });
-        }}
-        datasetCount={rows.length}
-      />
+      {/* VIEW 1: OVERVIEW & DOCS */}
+      {currentView === 'docs' && (
+        <>
+          <HeroSection
+            onScrollToStudio={() => handleViewChange('studio')}
+            datasetCount={rows.length}
+          />
 
-      {/* Interactive Classifier Studio Section */}
-      <section id="studio" className="scroll-mt-20 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-4 space-y-6">
-        <div className="flex items-center justify-between border-b border-ink-200/60 pb-3">
-          <div>
-            <div className="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider text-peach-800 font-semibold mb-1">
-              Interactive Environment
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-ink-900">
-              Dataset Classifier Studio
-            </h2>
-          </div>
-          <div className="text-xs text-ink-500 font-mono hidden sm:block">
-            Hugging Face Hub API · TypeSafe System One
-          </div>
-        </div>
+          <WhySection />
 
-        {/* Error notification if any */}
-        {datasetError && (
-          <div className="rounded-xl border border-peach-200 bg-peach-50/90 p-4 text-xs text-peach-900 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-soft-sm animate-fadeIn">
-            <div className="flex items-start gap-2.5">
-              <AlertCircle size={16} className="text-peach-700 shrink-0 mt-0.5" />
-              <div>
-                <span className="font-semibold block sm:inline mr-1">Dataset Notice:</span>
-                <span>{datasetError}</span>
+          {/* Quick Launch CTA Banner */}
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+            <div className="rounded-2xl border border-ink-200/80 bg-white p-8 text-center shadow-soft-sm">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-medium bg-peach-100 text-peach-800 border border-peach-200 mb-3">
+                <Sparkles size={13} />
+                <span>Interactive Classifier Studio</span>
               </div>
-            </div>
-            <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
-              {(datasetError.toLowerCase().includes('authentication') ||
-                datasetError.toLowerCase().includes('gated') ||
-                datasetError.toLowerCase().includes('private') ||
-                datasetError.toLowerCase().includes('does not exist')) && (
-                <button
-                  onClick={() => {
-                    setApiKeyModalTab('huggingface');
-                    setIsApiKeyModalOpen(true);
-                  }}
-                  className="px-3 py-1.5 rounded-lg bg-peach-700 text-white font-medium hover:bg-peach-800 shadow-soft-sm transition"
-                >
-                  Configure HF Token
-                </button>
-              )}
+              <h3 className="text-xl sm:text-2xl font-bold text-ink-900 mb-2">
+                Ready to evaluate your dataset?
+              </h3>
+              <p className="text-xs sm:text-sm text-ink-600 max-w-lg mx-auto mb-5 font-sans leading-relaxed">
+                Launch the studio workbench to classify Hugging Face datasets or upload your own files with calibrated probabilities and speculative fan-out.
+              </p>
               <button
-                onClick={() => fetchDatasetRows(selectedDataset, config, split, sampleSize, selectedColumn)}
-                className="px-3 py-1.5 rounded-lg border border-peach-300 font-medium hover:bg-peach-100/70 transition"
+                onClick={() => handleViewChange('studio')}
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-ink-900 text-white font-semibold text-xs shadow-soft-md hover:bg-peach-700 active:scale-[0.98] transition-all"
               >
-                Retry
+                <span>Launch Classifier Studio</span>
+                <Sparkles size={14} />
               </button>
             </div>
-          </div>
-        )}
+          </section>
 
-        {/* Auto-adaptation notification toast */}
-        {adaptationToast && (
-          <div className="rounded-xl border border-pastel-lavender-border bg-pastel-lavender/70 px-4 py-2 text-xs text-pastel-lavender-text shadow-soft-sm flex items-center justify-between transition-all animate-fadeIn">
-            <div className="flex items-center gap-2 font-medium">
-              <Sparkles size={14} className="text-[#4D3DB5]" />
-              <span>{adaptationToast}</span>
+          <Footer />
+        </>
+      )}
+
+      {/* VIEW 2: DEDICATED STUDIO WORKBENCH */}
+      {currentView === 'studio' && (
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-12 space-y-5">
+          {/* Breadcrumb & Section Title */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-ink-200/60 pb-3">
+            <div>
+              <div className="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider text-peach-800 font-semibold mb-1">
+                <span>Interactive Workbench</span>
+                <span className="text-ink-400">/</span>
+                <span className="text-ink-600">TypeSafe Jev System One</span>
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-ink-900">
+                Dataset Classifier Studio
+              </h1>
             </div>
+            <div className="flex items-center gap-2 font-mono text-xs text-ink-500">
+              <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span>Hub API Active</span>
+              <span className="text-ink-300">·</span>
+              <span>Speculative Fan-out</span>
+            </div>
+          </div>
+
+          {/* Error notification if any */}
+          {datasetError && (
+            <div className="rounded-xl border border-peach-200 bg-peach-50/90 p-4 text-xs text-peach-900 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-soft-sm animate-fadeIn">
+              <div className="flex items-start gap-2.5">
+                <AlertCircle size={16} className="text-peach-700 shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-semibold block sm:inline mr-1">Dataset Notice:</span>
+                  <span>{datasetError}</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                {(datasetError.toLowerCase().includes('authentication') ||
+                  datasetError.toLowerCase().includes('gated') ||
+                  datasetError.toLowerCase().includes('private') ||
+                  datasetError.toLowerCase().includes('does not exist')) && (
+                  <button
+                    onClick={() => {
+                      setApiKeyModalTab('huggingface');
+                      setIsApiKeyModalOpen(true);
+                    }}
+                    className="px-3 py-1.5 rounded-lg bg-peach-700 text-white font-medium hover:bg-peach-800 shadow-soft-sm transition"
+                  >
+                    Configure HF Token
+                  </button>
+                )}
+                <button
+                  onClick={() => fetchDatasetRows(selectedDataset, config, split, sampleSize, selectedColumn)}
+                  className="px-3 py-1.5 rounded-lg border border-peach-300 font-medium hover:bg-peach-100/70 transition"
+                >
+                  Retry
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Auto-adaptation notification toast */}
+          {adaptationToast && (
+            <div className="rounded-xl border border-pastel-lavender-border bg-pastel-lavender/70 px-4 py-2 text-xs text-pastel-lavender-text shadow-soft-sm flex items-center justify-between transition-all animate-fadeIn">
+              <div className="flex items-center gap-2 font-medium">
+                <Sparkles size={14} className="text-[#4D3DB5]" />
+                <span>{adaptationToast}</span>
+              </div>
+              <button
+                onClick={() => setAdaptationToast(null)}
+                className="text-ink-400 hover:text-ink-700 p-0.5 rounded transition"
+                aria-label="Dismiss notification"
+              >
+                <X size={13} />
+              </button>
+            </div>
+          )}
+
+          {/* Studio Command Bar: High-density, uncluttered controls */}
+          <div className="rounded-2xl border border-ink-200/80 bg-white p-4 shadow-soft-sm space-y-3.5">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-ink-100 pb-3">
+              {/* Active Dataset Pill & Picker Trigger */}
+              <div className="flex flex-wrap items-center gap-2.5">
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-ink-50 border border-ink-200/80 text-xs font-mono">
+                  <Database size={14} className="text-peach-700" />
+                  <span className="font-semibold text-ink-900 max-w-[220px] truncate" title={selectedDataset}>
+                    {selectedDataset}
+                  </span>
+                  {isLoadingDataset && (
+                    <span className="text-[10px] text-peach-700 animate-pulse font-bold">Loading...</span>
+                  )}
+                </div>
+
+                <button
+                  onClick={() => setIsDatasetPickerOpen(true)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-ink-900 text-white hover:bg-peach-700 text-xs font-medium shadow-soft-sm transition"
+                >
+                  <Database size={13} />
+                  <span>Change Dataset</span>
+                </button>
+
+                {/* Inline Configuration Dropdowns */}
+                <div className="flex flex-wrap items-center gap-2">
+                  {/* Split Dropdown */}
+                  <div className="flex items-center gap-1 text-xs font-mono bg-ink-50 px-2.5 py-1 rounded-lg border border-ink-200">
+                    <span className="text-ink-400 text-[11px]">split:</span>
+                    <select
+                      value={split}
+                      onChange={(e) => handleSplitChange(e.target.value)}
+                      disabled={isLoadingDataset}
+                      className="bg-transparent text-ink-800 font-semibold focus:outline-none cursor-pointer text-xs"
+                    >
+                      <option value="train">train</option>
+                      <option value="test">test</option>
+                      <option value="validation">validation</option>
+                    </select>
+                  </div>
+
+                  {/* Rows Limit Dropdown */}
+                  <div className="flex items-center gap-1 text-xs font-mono bg-ink-50 px-2.5 py-1 rounded-lg border border-ink-200">
+                    <span className="text-ink-400 text-[11px]">rows:</span>
+                    <select
+                      value={sampleSize}
+                      onChange={(e) => handleSampleSizeChange(Number(e.target.value))}
+                      disabled={isLoadingDataset}
+                      className="bg-transparent text-ink-800 font-semibold focus:outline-none cursor-pointer text-xs"
+                    >
+                      <option value={5}>5</option>
+                      <option value={10}>10</option>
+                      <option value={25}>25</option>
+                      <option value={50}>50</option>
+                      <option value={100}>100</option>
+                    </select>
+                  </div>
+
+                  {/* Target Column Dropdown */}
+                  {candidateColumns.length > 0 && (
+                    <div className="flex items-center gap-1 text-xs font-mono bg-ink-50 px-2.5 py-1 rounded-lg border border-ink-200">
+                      <span className="text-ink-400 text-[11px]">col:</span>
+                      <select
+                        value={selectedColumn}
+                        onChange={(e) => setSelectedColumn(e.target.value)}
+                        disabled={isLoadingDataset}
+                        className="bg-transparent text-ink-800 font-semibold focus:outline-none cursor-pointer text-xs max-w-[130px] truncate"
+                      >
+                        {candidateColumns.map((col) => (
+                          <option key={col} value={col}>{col}</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Rubrics & Dimension Manager Trigger */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setIsDimensionManagerOpen(true)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-pastel-lavender/60 border border-pastel-lavender-border text-xs text-pastel-lavender-text font-mono hover:bg-pastel-lavender transition"
+                  title="Configure rubrics, criteria, and primitives"
+                >
+                  <Sliders size={13} />
+                  <span className="font-semibold">{dimensions.filter(d => d.enabled).length} Rubrics Active</span>
+                  <span className="text-[10px] opacity-75 hidden sm:inline">({activePackName})</span>
+                </button>
+
+                <button
+                  onClick={handleReGenerateDimensions}
+                  title="Auto-adapt rubrics to current dataset"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-ink-200 hover:bg-ink-50 text-xs font-mono text-ink-700 transition"
+                >
+                  <Sparkles size={13} className="text-peach-700" />
+                  <span className="hidden sm:inline">Auto-Adapt</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Batch Execution Controls Bar */}
+            <BatchControls
+              totalRows={rows.length}
+              completedRows={completedCount}
+              isRunning={isRunningBatch}
+              onStart={handleStartBatch}
+              onStop={handleStopBatch}
+              onReset={handleResetBatch}
+              onExport={() => setIsExportModalOpen(true)}
+              activeDimensionCount={dimensions.filter(d => d.enabled).length}
+              totalTokens={totalTokens}
+              avgLatencyMs={avgLatencyMs}
+              isSimulated={isSimulated}
+            />
+          </div>
+
+          {/* Tab Navigation (Table vs Analytics) */}
+          <div className="flex items-center gap-2 border-b border-ink-200/80 pb-1">
             <button
-              onClick={() => setAdaptationToast(null)}
-              className="text-ink-400 hover:text-ink-700 p-0.5 rounded transition"
-              aria-label="Dismiss notification"
+              onClick={() => setActiveTab('table')}
+              className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-semibold transition ${
+                activeTab === 'table'
+                  ? 'bg-white text-ink-900 shadow-soft-sm border border-ink-200'
+                  : 'text-ink-600 hover:text-ink-900'
+              }`}
             >
-              <X size={13} />
+              <Table size={14} />
+              <span>Classified Table ({rows.length})</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('analytics')}
+              className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-semibold transition ${
+                activeTab === 'analytics'
+                  ? 'bg-white text-ink-900 shadow-soft-sm border border-ink-200'
+                  : 'text-ink-600 hover:text-ink-900'
+              }`}
+            >
+              <BarChart2 size={14} />
+              <span>Dimension Analytics &amp; Certainty</span>
             </button>
           </div>
-        )}
 
-        {/* 1. Dataset Selector Card */}
+          {/* Tab 1: Dataset Table */}
+          {activeTab === 'table' && (
+            <DatasetTable
+              rows={rows}
+              dimensions={dimensions}
+              selectedColumn={selectedColumn}
+              onInspectRow={(r) => setInspectingRow(r)}
+              onClassifySingleRow={handleClassifySingleRow}
+              evaluatingRowIdx={evaluatingRowIdx}
+            />
+          )}
+
+          {/* Tab 2: Dimension Analytics */}
+          {activeTab === 'analytics' && (
+            <AnalyticsPanel
+              rows={rows}
+              dimensions={dimensions}
+              onInspectRow={(r) => setInspectingRow(r)}
+            />
+          )}
+        </main>
+      )}
+
+      {/* MODAL 1: Dataset Picker Modal */}
+      {isDatasetPickerOpen && (
         <DatasetSelector
           selectedDataset={selectedDataset}
           config={config}
@@ -508,12 +749,24 @@ export function App() {
           features={features}
           isLoading={isLoadingDataset}
           hfToken={hfToken}
-          onSelectDataset={handleSelectDataset}
+          isModal={true}
+          onClose={() => setIsDatasetPickerOpen(false)}
+          onOpenApiKeyModal={(tab) => {
+            setApiKeyModalTab(tab);
+            setIsApiKeyModalOpen(true);
+          }}
+          onSelectDataset={(dsId, cfg, splt, col) => {
+            handleSelectDataset(dsId, cfg, splt, col);
+            setIsDatasetPickerOpen(false);
+          }}
           onConfigChange={handleConfigChange}
           onSplitChange={handleSplitChange}
           onSampleSizeChange={handleSampleSizeChange}
           onColumnChange={setSelectedColumn}
-          onLoadCustomRows={handleLoadCustomRows}
+          onLoadCustomRows={(customRows, name, col) => {
+            handleLoadCustomRows(customRows, name, col);
+            setIsDatasetPickerOpen(false);
+          }}
           onApplyRecommendedPack={(packId) => {
             const found = PRESET_DIMENSION_PACKS.find(p => p.id === packId);
             if (found) {
@@ -522,8 +775,10 @@ export function App() {
             }
           }}
         />
+      )}
 
-        {/* 2. Dimension Manager Card with Dynamic Auto-Adapt */}
+      {/* MODAL 2: Dimension Manager Modal */}
+      {isDimensionManagerOpen && (
         <DimensionManager
           dimensions={dimensions}
           onToggleDimension={handleToggleDimension}
@@ -538,79 +793,12 @@ export function App() {
           onToggleAutoAdapt={setAutoAdaptDimensions}
           activePackName={activePackName}
           onReGenerate={handleReGenerateDimensions}
+          isModal={true}
+          onClose={() => setIsDimensionManagerOpen(false)}
         />
+      )}
 
-        {/* 3. Batch Controls Bar */}
-        <BatchControls
-          totalRows={rows.length}
-          completedRows={completedCount}
-          isRunning={isRunningBatch}
-          onStart={handleStartBatch}
-          onStop={handleStopBatch}
-          onReset={handleResetBatch}
-          onExport={() => setIsExportModalOpen(true)}
-          activeDimensionCount={dimensions.filter(d => d.enabled).length}
-          totalTokens={totalTokens}
-          avgLatencyMs={avgLatencyMs}
-          isSimulated={isSimulated}
-        />
-
-        {/* 4. Tab Navigation (Table vs Analytics) */}
-        <div className="flex items-center gap-2 border-b border-ink-200/80 pb-1">
-          <button
-            onClick={() => setActiveTab('table')}
-            className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-semibold transition ${
-              activeTab === 'table'
-                ? 'bg-white text-ink-900 shadow-soft-sm border border-ink-200'
-                : 'text-ink-600 hover:text-ink-900'
-            }`}
-          >
-            <Table size={14} />
-            <span>Classified Table ({rows.length})</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('analytics')}
-            className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-semibold transition ${
-              activeTab === 'analytics'
-                ? 'bg-white text-ink-900 shadow-soft-sm border border-ink-200'
-                : 'text-ink-600 hover:text-ink-900'
-            }`}
-          >
-            <BarChart2 size={14} />
-            <span>Dimension Analytics & Certainty</span>
-          </button>
-        </div>
-
-        {/* Tab 1: Dataset Table */}
-        {activeTab === 'table' && (
-          <DatasetTable
-            rows={rows}
-            dimensions={dimensions}
-            selectedColumn={selectedColumn}
-            onInspectRow={(r) => setInspectingRow(r)}
-            onClassifySingleRow={handleClassifySingleRow}
-            evaluatingRowIdx={evaluatingRowIdx}
-          />
-        )}
-
-        {/* Tab 2: Dimension Analytics */}
-        {activeTab === 'analytics' && (
-          <AnalyticsPanel
-            rows={rows}
-            dimensions={dimensions}
-            onInspectRow={(r) => setInspectingRow(r)}
-          />
-        )}
-      </section>
-
-      {/* Why System One & Primitives Guide */}
-      <WhySection />
-
-      {/* Footer */}
-      <Footer />
-
-      {/* Deep Row Inspection Modal */}
+      {/* MODAL 3: Deep Row Inspection Modal */}
       <RowInspectorModal
         isOpen={!!inspectingRow}
         onClose={() => setInspectingRow(null)}
@@ -619,7 +807,7 @@ export function App() {
         selectedColumn={selectedColumn}
       />
 
-      {/* Export Enriched Dataset Modal */}
+      {/* MODAL 4: Export Enriched Dataset Modal */}
       <ExportModal
         isOpen={isExportModalOpen}
         onClose={() => setIsExportModalOpen(false)}
@@ -628,7 +816,7 @@ export function App() {
         datasetName={selectedDataset}
       />
 
-      {/* API Key Configuration Modal */}
+      {/* MODAL 5: API Key Configuration Modal */}
       <ApiKeyModal
         isOpen={isApiKeyModalOpen}
         onClose={() => setIsApiKeyModalOpen(false)}
