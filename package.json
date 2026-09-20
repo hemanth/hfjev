@@ -1,0 +1,39 @@
+{
+  "name": "hfjev",
+  "version": "0.1.0",
+  "description": "Classify Hugging Face datasets across typed semantic dimensions with TypeSafe Jev System One",
+  "type": "module",
+  "main": "src/index.js",
+  "module": "src/index.js",
+  "types": "src/index.d.ts",
+  "bin": {
+    "hfjev": "bin/hfjev.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "import": "./src/index.js"
+    }
+  },
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  },
+  "files": [
+    "bin",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "author": "Hemanth HM <hemanth@h3manth.com> (https://h3manth.com)",
+  "license": "MIT",
+  "keywords": [
+    "huggingface",
+    "typesafe",
+    "jev",
+    "dataset",
+    "classifier",
+    "system-one",
+    "semantic",
+    "speculative-fanout"
+  ]
+}
