@@ -81,7 +81,49 @@
     .badge-noul { background-color: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
     .badge-score { background-color: #ffedd5; color: #9a3412; border: 1px solid #fed7aa; }
     .badge-domain { background-color: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+
+    /* High-Contrast Syntax Highlighting Tokens */
+    pre[class*="language-"], code[class*="language-"] {
+      font-family: 'Geist Mono', monospace;
+      font-size: 12px;
+      line-height: 1.65;
+      text-shadow: none;
+      background: #18181b !important;
+    }
+    .token.comment, .token.prolog, .token.doctype, .token.cdata {
+      color: #71717a !important;
+      font-style: italic;
+    }
+    .token.punctuation {
+      color: #e4e4e7 !important;
+    }
+    .token.property, .token.tag, .token.boolean, .token.number, .token.constant, .token.symbol, .token.deleted {
+      color: #fb923c !important;
+    }
+    .token.selector, .token.attr-name, .token.string, .token.char, .token.builtin, .token.inserted {
+      color: #4ade80 !important;
+    }
+    .token.operator, .token.entity, .token.url, .language-css .token.string, .style .token.string {
+      color: #e4e4e7 !important;
+    }
+    .token.atrule, .token.attr-value, .token.keyword {
+      color: #c084fc !important;
+      font-weight: 600;
+    }
+    .token.function, .token.class-name {
+      color: #38bdf8 !important;
+      font-weight: 600;
+    }
+    .token.regex, .token.important, .token.variable {
+      color: #fde047 !important;
+    }
   </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
 </head>
 <body class="min-h-screen font-sans antialiased text-ink-900 noise-bg">
 
@@ -256,12 +298,11 @@
               <span class="font-bold text-ink-700 uppercase tracking-wider">Raw Typed Output Payload</span>
               <span class="text-ink-400">JSON Record</span>
             </div>
-            <pre id="raw-payload" class="p-3 rounded-lg bg-ink-900 text-ink-100 text-xs font-mono overflow-x-auto max-h-56 leading-relaxed">
-{
+            <pre class="p-3 rounded-lg bg-ink-900 text-ink-100 text-xs font-mono overflow-x-auto max-h-56 leading-relaxed"><code id="raw-payload" class="language-json">{
   "answers": {},
   "confidence": 0.0,
   "model": "jev-latest-simulated"
-}</pre>
+}</code></pre>
           </div>
         </div>
 
@@ -405,8 +446,7 @@
           <span>Python 3.10+ • pip install hfjev</span>
           <button onclick="copyCode('py-block', this)" class="text-xs hover:text-ink-900 underline">copy code</button>
         </div>
-        <pre id="py-block" class="p-4 rounded-lg bg-ink-900 text-ink-100 text-xs font-mono overflow-x-auto leading-relaxed">
-import hfjev
+        <pre class="p-4 rounded-lg bg-ink-900 text-ink-100 text-xs font-mono overflow-x-auto leading-relaxed"><code id="py-block" class="language-python">import hfjev
 
 # Ingest any Hugging Face dataset or local file
 dataset = hfjev('cornell-movie-review-data/rotten_tomatoes')
@@ -424,7 +464,7 @@ print(results[0]['answers'])
 # Streaming row-by-row
 for row in dataset.stream():
     print(f"[Row {row['index']}]", row['answers'])
-</pre>
+</code></pre>
       </div>
 
       <!-- JS TAB -->
@@ -433,8 +473,7 @@ for row in dataset.stream():
           <span>Node.js ESM / CJS • npm install hfjev</span>
           <button onclick="copyCode('js-block', this)" class="text-xs hover:text-ink-900 underline">copy code</button>
         </div>
-        <pre id="js-block" class="p-4 rounded-lg bg-ink-900 text-ink-100 text-xs font-mono overflow-x-auto leading-relaxed">
-import hfjev from 'hfjev';
+        <pre class="p-4 rounded-lg bg-ink-900 text-ink-100 text-xs font-mono overflow-x-auto leading-relaxed"><code id="js-block" class="language-javascript">import hfjev from 'hfjev';
 
 // Ingest dataset
 const dataset = await hfjev('cornell-movie-review-data/rotten_tomatoes');
@@ -448,7 +487,7 @@ console.log(results[0].answers);
 await dataset.stream((row) => {
   console.log(`[Row ${row.index}]`, row.answers);
 });
-</pre>
+</code></pre>
       </div>
 
       <!-- CLI TAB -->
@@ -457,8 +496,7 @@ await dataset.stream((row) => {
           <span>Terminal CLI • npx hfjev or hfjev</span>
           <button onclick="copyCode('cli-block', this)" class="text-xs hover:text-ink-900 underline">copy code</button>
         </div>
-        <pre id="cli-block" class="p-4 rounded-lg bg-ink-900 text-ink-100 text-xs font-mono overflow-x-auto leading-relaxed">
-# Python CLI
+        <pre class="p-4 rounded-lg bg-ink-900 text-ink-100 text-xs font-mono overflow-x-auto leading-relaxed"><code id="cli-block" class="language-bash"># Python CLI
 hfjev cornell-movie-review-data/rotten_tomatoes --limit 5
 
 # Node CLI
@@ -466,7 +504,7 @@ npx hfjev cornell-movie-review-data/rotten_tomatoes --limit 5
 
 # Custom column and offline simulation
 hfjev ag_news --column text --limit 3 --simulate
-</pre>
+</code></pre>
       </div>
     </section>
 
@@ -623,7 +661,11 @@ hfjev ag_news --column text --limit 3 --simulate
         dimensions_evaluated: activePreset.dimensions.length,
         fan_out_pass: 'single-parallel-request'
       };
-      document.getElementById('raw-payload').textContent = JSON.stringify(payload, null, 2);
+      const rawEl = document.getElementById('raw-payload');
+      rawEl.textContent = JSON.stringify(payload, null, 2);
+      if (window.Prism) {
+        Prism.highlightElement(rawEl);
+      }
     }
 
     function renderResultCards(answers) {
@@ -732,6 +774,10 @@ hfjev ag_news --column text --limit 3 --simulate
 
       document.getElementById('code-' + tab).classList.remove('hidden');
       document.getElementById('tab-btn-' + tab).className = 'px-3 py-1.5 rounded-md bg-ink-900 text-white font-bold transition-colors';
+
+      if (window.Prism) {
+        Prism.highlightAll();
+      }
     }
 
     function copyCmd(cmd, btn) {
@@ -752,6 +798,9 @@ hfjev ag_news --column text --limit 3 --simulate
     // Initialize workbench
     document.addEventListener('DOMContentLoaded', () => {
       onDatasetChange();
+      if (window.Prism) {
+        Prism.highlightAll();
+      }
     });
   </script>
 </body>
