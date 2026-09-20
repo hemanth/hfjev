@@ -135,7 +135,7 @@ export const DimensionEditorModal: React.FC<DimensionEditorModalProps> = ({
               {initialDimension ? 'Edit Dimension' : 'Create Custom Dimension'}
             </h3>
             <p className="text-xs text-ink-500">
-              Configure question primitive and criteria for TypeSafe System One Jev
+              Configure question primitive and rubric criteria
             </p>
           </div>
         </div>
@@ -221,7 +221,7 @@ export const DimensionEditorModal: React.FC<DimensionEditorModalProps> = ({
           {/* Question Instructions */}
           <div>
             <label className="block text-xs font-medium text-ink-700 mb-1">
-              Question Instructions (Prompt sent to Jev)
+              Question Instructions
             </label>
             <textarea
               value={instructions}

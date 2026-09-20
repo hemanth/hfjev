@@ -63,7 +63,7 @@ hfjev cornell-movie-review-data/rotten_tomatoes --limit 10`;
           {/* Eyebrow badge */}
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-peach-50 text-peach-800 border border-peach-200 text-xs font-mono font-medium mb-5">
             <span className="w-2 h-2 rounded-full bg-peach-700 animate-pulse"></span>
-            <span>Multidimensional Dataset Intelligence · TypeSafe Jev</span>
+            <span>Multidimensional Dataset Intelligence</span>
           </div>
 
           {/* Editorial Display Headline */}
@@ -73,7 +73,7 @@ hfjev cornell-movie-review-data/rotten_tomatoes --limit 10`;
 
           {/* Subtitle */}
           <p className="mt-4 text-base sm:text-lg text-ink-700 leading-relaxed max-w-2xl font-normal">
-            Triage, label, and score real-world datasets across multiple typed dimensions simultaneously. Powered by TypeSafe Jev System One models with calibrated probabilities, speculative fan-out, and zero hallucinated tokens.
+            Triage, label, and score real-world datasets across multiple typed dimensions simultaneously with calibrated probabilities, speculative fan-out, and zero token hallucination.
           </p>
 
           {/* Actions */}
@@ -90,7 +90,7 @@ hfjev cornell-movie-review-data/rotten_tomatoes --limit 10`;
               href="#how-it-works"
               className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white text-ink-800 font-medium text-xs border border-ink-200 hover:bg-ink-50 transition-all shadow-soft-sm"
             >
-              <span>How System One Works</span>
+              <span>Architecture &amp; Benchmarks</span>
             </a>
           </div>
 

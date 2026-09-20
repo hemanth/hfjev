@@ -81,7 +81,7 @@ export const AnalyticsPanel: React.FC<AnalyticsPanelProps> = ({
             {Math.round(avgConfidence * 100)}%
           </div>
           <div className="text-[11px] text-ink-500 mt-1">
-            Calibrated Jev confidence
+            Calibrated confidence
           </div>
         </div>
 
@@ -297,7 +297,7 @@ export const AnalyticsPanel: React.FC<AnalyticsPanelProps> = ({
               </h3>
             </div>
             <span className="text-xs text-ink-500">
-              TypeSafe confidence alerts where probability was divided
+              Confidence alerts where probability was divided
             </span>
           </div>
 

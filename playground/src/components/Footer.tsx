@@ -7,21 +7,21 @@ export const Footer: React.FC = () => {
       <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-ink-500 font-mono">
         <div className="flex items-center gap-2">
           <div className="w-5 h-5 rounded-lg bg-ink-900 text-white flex items-center justify-center font-bold text-[10px]">
-            J
+            h
           </div>
           <span>
-            Powered by <strong className="text-ink-800">TypeSafe Jev System One</strong> &amp; <strong className="text-ink-800">Hugging Face Hub</strong>
+            <strong className="text-ink-800">hfjev</strong> · Open-source semantic evaluation for Hugging Face
           </span>
         </div>
 
         <div className="flex items-center gap-5 text-ink-600">
           <a
-            href="https://docs.typesafe.ai"
+            href="https://github.com/hemanth/hfjev"
             target="_blank"
             rel="noreferrer"
             className="hover:text-ink-900 transition flex items-center gap-1"
           >
-            <span>TypeSafe Documentation</span>
+            <span>GitHub Repository</span>
             <ExternalLink size={10} />
           </a>
           <a
@@ -30,17 +30,14 @@ export const Footer: React.FC = () => {
             rel="noreferrer"
             className="hover:text-ink-900 transition flex items-center gap-1"
           >
-            <span>Hugging Face Datasets</span>
+            <span>Hugging Face Hub</span>
             <ExternalLink size={10} />
           </a>
           <a
-            href="https://github.com/typesafe-ai"
-            target="_blank"
-            rel="noreferrer"
+            href="#/"
             className="hover:text-ink-900 transition flex items-center gap-1"
           >
-            <span>GitHub</span>
-            <ExternalLink size={10} />
+            <span>Documentation</span>
           </a>
         </div>
       </div>

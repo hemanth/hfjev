@@ -65,7 +65,7 @@ export const RowInspectorModal: React.FC<RowInspectorModalProps> = ({
                 )}
               </div>
               <p className="text-xs text-ink-500">
-                System One state, judgments, and calibrated probability distributions
+                Evaluation state, judgments, and calibrated probability distributions
               </p>
             </div>
           </div>

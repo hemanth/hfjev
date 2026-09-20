@@ -503,13 +503,13 @@ export function App() {
           {/* Breadcrumb & Section Title */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-ink-200/60 pb-3">
             <div>
-              <div className="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider text-peach-800 font-semibold mb-1">
-                <span>Interactive Workbench</span>
+              <div className="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider text-ink-500 font-semibold mb-1">
+                <span>Workspace</span>
                 <span className="text-ink-400">/</span>
-                <span className="text-ink-600">TypeSafe Jev System One</span>
+                <span className="text-peach-700">Dataset Classifier</span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-ink-900">
-                Dataset Classifier Studio
+                Classifier Studio
               </h1>
             </div>
             <div className="flex items-center gap-2 font-mono text-xs text-ink-500">

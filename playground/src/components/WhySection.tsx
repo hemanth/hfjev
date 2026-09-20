@@ -51,17 +51,17 @@ export const WhySection: React.FC = () => {
           </ul>
         </div>
 
-        {/* TypeSafe Jev System One Solution */}
+        {/* Solution */}
         <div className="rounded-2xl border border-sage-200 bg-sage-50/30 p-6 shadow-soft-sm">
           <div className="flex items-center gap-2 text-sage-800 text-xs font-mono font-semibold uppercase mb-3">
             <Check size={15} />
-            <span>The TypeSafe Jev Paradigm</span>
+            <span>The Speculative Paradigm</span>
           </div>
           <h3 className="text-base font-semibold text-ink-900 mb-2">
-            System One Calibrated Judgments
+            Calibrated Decision Engine
           </h3>
           <p className="text-xs text-ink-600 mb-4 leading-relaxed">
-            Small units of AI intelligence returning typed judgments and calibrated probabilities directly to code.
+            Typed judgments and calibrated probabilities returned directly to code in a single round-trip.
           </p>
 
           <ul className="space-y-3 text-xs text-ink-700 font-sans">
@@ -92,7 +92,7 @@ export const WhySection: React.FC = () => {
             Core Building Blocks
           </div>
           <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-ink-900">
-            Three Typed System One Primitives
+            Three Typed Primitives
           </h2>
           <p className="text-ink-700 text-sm mt-1">
             Choose the primitive that matches what your downstream code or data pipeline needs to consume:

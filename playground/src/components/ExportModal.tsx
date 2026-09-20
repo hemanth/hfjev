@@ -135,7 +135,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
           <div>
             <h3 className="text-base font-semibold text-ink-900">Export Classified Dataset</h3>
             <p className="text-xs text-ink-500">
-              {evaluatedRows.length} rows with TypeSafe System One judgments
+              {evaluatedRows.length} rows evaluated with typed classifications
             </p>
           </div>
         </div>
@@ -187,7 +187,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
 
           <div className="rounded-xl bg-ink-50 p-3 text-xs text-ink-600 leading-relaxed">
             {format === 'csv' && (
-              <p>Columns will include all source fields plus flattened TypeSafe columns (e.g. choice, score, confidence).</p>
+              <p>Columns will include all source fields plus flattened evaluation columns (e.g. choice, score, confidence).</p>
             )}
             {format === 'json' && (
               <p>Full structured records with complete probability distributions, confidence ratings, and model metadata.</p>

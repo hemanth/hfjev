@@ -1,5 +1,5 @@
 import React from 'react';
-import { Key, ExternalLink, Sliders, Database, Layers, Sparkles, Terminal } from 'lucide-react';
+import { Key } from 'lucide-react';
 
 interface HeaderProps {
   currentView: 'docs' | 'studio';
@@ -19,92 +19,73 @@ export const Header: React.FC<HeaderProps> = ({
   isSimulated,
   hfToken,
   onOpenApiKeyModal,
-  activeDatasetName,
   totalEvaluated,
 }) => {
   return (
-    <header className="sticky top-0 z-50 w-full px-4 sm:px-6 lg:px-8 pt-3 pb-2.5 backdrop-blur-md bg-[#fbfaf7]/90 border-b border-ink-200/60 transition-all">
+    <header className="sticky top-0 z-50 w-full px-4 sm:px-6 lg:px-8 py-2.5 backdrop-blur-md bg-[#fbfaf7]/85 border-b border-ink-200/50 transition-all">
       <nav className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-        {/* Brand & Logo */}
+        {/* Brand: clean, minimal hfjev */}
         <div className="flex items-center gap-3">
           <button
             onClick={() => onChangeView('docs')}
-            className="group flex items-center gap-2.5 font-bold tracking-tight text-ink-900 text-lg"
+            className="group flex items-center gap-2 font-mono text-sm font-bold tracking-tight text-ink-900 hover:opacity-80 transition"
           >
-            <div className="relative flex h-8 w-8 items-center justify-center rounded-xl bg-ink-900 text-white shadow-soft-sm group-hover:bg-peach-700 transition-colors duration-300">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-              </svg>
-            </div>
-            <div className="flex items-center gap-1.5 leading-none">
-              <span className="font-bold tracking-tight text-ink-900 text-base font-sans">TypeSafe</span>
-              <span className="font-mono text-sm font-semibold text-peach-700">Jev</span>
-              <span className="text-ink-400 text-xs">/</span>
-              <span className="text-xs font-medium text-ink-500 font-mono">hfjev</span>
-            </div>
+            <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-ink-900 text-white text-xs font-bold shadow-soft-xs group-hover:bg-peach-700 transition">
+              h
+            </span>
+            <span className="text-ink-900 font-semibold tracking-tight text-sm">hfjev</span>
           </button>
-
-          <div className="hidden lg:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-mono font-medium bg-sage-100 text-sage-800 border border-sage-200">
-            <span className="w-1.5 h-1.5 rounded-full bg-sage-700"></span>
-            <span>System One · Speculative Fan-out</span>
-          </div>
         </div>
 
-        {/* View Switcher: Studio Workbench vs Overview/Blueprint */}
-        <div className="flex items-center rounded-xl bg-ink-100/80 p-1 border border-ink-200/70 text-xs font-mono">
+        {/* Minimal View Switcher: Studio vs Docs */}
+        <div className="flex items-center rounded-xl bg-ink-100/70 p-0.5 border border-ink-200/50 text-xs font-mono">
           <button
             onClick={() => onChangeView('studio')}
-            className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg transition-all ${
+            className={`inline-flex items-center px-3 py-1 rounded-lg transition-all ${
               currentView === 'studio'
-                ? 'bg-white text-ink-900 font-bold shadow-soft-sm'
-                : 'text-ink-600 hover:text-ink-900'
+                ? 'bg-white text-ink-900 font-semibold shadow-soft-xs'
+                : 'text-ink-500 hover:text-ink-900'
             }`}
           >
-            <span className={`w-1.5 h-1.5 rounded-full ${currentView === 'studio' ? 'bg-peach-600' : 'bg-transparent'}`}></span>
-            <span>Studio Workbench</span>
+            <span>Studio</span>
           </button>
 
           <button
             onClick={() => onChangeView('docs')}
-            className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg transition-all ${
+            className={`inline-flex items-center px-3 py-1 rounded-lg transition-all ${
               currentView === 'docs'
-                ? 'bg-white text-ink-900 font-bold shadow-soft-sm'
-                : 'text-ink-600 hover:text-ink-900'
+                ? 'bg-white text-ink-900 font-semibold shadow-soft-xs'
+                : 'text-ink-500 hover:text-ink-900'
             }`}
           >
-            <span className={`w-1.5 h-1.5 rounded-full ${currentView === 'docs' ? 'bg-peach-600' : 'bg-transparent'}`}></span>
-            <span>Overview &amp; Docs</span>
+            <span>Docs</span>
           </button>
         </div>
 
-        {/* Actions: API Keys & External Links */}
+        {/* Actions: Keys & GitHub */}
         <div className="flex items-center gap-2 font-mono text-xs">
           {totalEvaluated > 0 && (
-            <div className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-mono font-medium bg-sage-100 text-sage-800 border border-sage-200">
-              <span className="w-1.5 h-1.5 rounded-full bg-sage-700"></span>
-              <span>{totalEvaluated} Classified</span>
-            </div>
+            <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-mono text-sage-800 bg-sage-50 border border-sage-200/70">
+              {totalEvaluated} done
+            </span>
           )}
 
-          {/* Explicit API Keys Button */}
           <button
             onClick={() => onOpenApiKeyModal()}
-            className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 font-medium transition shadow-soft-sm ${
+            className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 font-medium transition ${
               apiKey && !isSimulated
                 ? 'border-emerald-300 bg-emerald-50 text-emerald-900 hover:bg-emerald-100'
-                : isSimulated
-                ? 'border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100'
                 : 'border-ink-200 bg-white text-ink-700 hover:bg-ink-50'
             }`}
-            title="Configure TypeSafe Jev API Key and Hugging Face Token"
+            title="Configure API credentials and tokens"
           >
-            <Key size={13} className={apiKey && !isSimulated ? "text-emerald-700" : "text-amber-700"} />
-            <span>API Keys</span>
-            <span className="text-[10px] opacity-75">
-              ({apiKey && !isSimulated ? 'Live' : 'Sim'})
+            <Key size={12} className={apiKey && !isSimulated ? "text-emerald-700" : "text-ink-500"} />
+            <span>Keys</span>
+            <span className="text-[10px] text-ink-400">
+              {apiKey && !isSimulated ? 'live' : 'sim'}
             </span>
             {hfToken && (
-              <span className="w-1.5 h-1.5 rounded-full bg-peach-600" title="HF Token Configured"></span>
+              <span className="w-1.5 h-1.5 rounded-full bg-peach-600" title="HF Token Active"></span>
             )}
           </button>
 
@@ -112,10 +93,12 @@ export const Header: React.FC<HeaderProps> = ({
             href="https://github.com/hemanth/hfjev"
             target="_blank"
             rel="noreferrer"
-            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white text-ink-700 border border-ink-200 hover:bg-ink-50 font-medium transition shadow-soft-sm"
+            className="text-ink-500 hover:text-ink-900 transition p-1"
+            title="GitHub Repository"
           >
-            <span>GitHub</span>
-            <ExternalLink size={11} />
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+            </svg>
           </a>
         </div>
       </nav>

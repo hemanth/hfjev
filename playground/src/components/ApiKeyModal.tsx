@@ -116,7 +116,7 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
                 : 'border-transparent text-ink-500 hover:text-ink-800'
             }`}
           >
-            <span>TypeSafe Jev API Key</span>
+            <span>Jev API Key</span>
             <span className={`w-2 h-2 rounded-full ${inputKey ? 'bg-emerald-500' : 'bg-ink-300'}`}></span>
           </button>
           <button
@@ -141,7 +141,7 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
               <div>
                 <div className="flex items-center justify-between mb-1.5">
                   <label className="text-xs font-semibold text-ink-800">
-                    TypeSafe System One API Key
+                    System One API Key
                   </label>
                   <a
                     href="https://typesafe.ai"
