@@ -1,0 +1,57 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "hfjev"
+version = "0.1.0"
+description = "Classify Hugging Face datasets across typed semantic dimensions with TypeSafe Jev System One."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [
+    { name = "Hemanth HM", email = "hemanth@h3manth.com" }
+]
+keywords = [
+    "huggingface",
+    "typesafe",
+    "jev",
+    "dataset",
+    "classifier",
+    "system-one",
+    "semantic",
+    "speculative-fanout",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+]
+
+[project.scripts]
+hfjev = "hfjev.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/hemanth/hfjev"
+Repository = "https://github.com/hemanth/hfjev"
+Issues = "https://github.com/hemanth/hfjev/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/hfjev"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

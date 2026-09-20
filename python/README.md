@@ -3,16 +3,10 @@
 Classify Hugging Face datasets across typed semantic dimensions with TypeSafe Jev System One.
 
 ```bash
-# Python
 pip install hfjev
-
-# Node.js
-npm install hfjev
 ```
 
 ## Quick start
-
-### Python
 
 ```python
 import hfjev
@@ -23,18 +17,15 @@ results = dataset.classify()
 print(results[0]['answers'])
 ```
 
-### JavaScript
+`hfjev()` loads any Hugging Face dataset, auto-adapts evaluation rubrics to the domain, and classifies each row in a single parallel System One call with calibrated probabilities.
 
-```js
-import hfjev from 'hfjev';
+## Gated & private datasets
 
-const dataset = await hfjev('cornell-movie-review-data/rotten_tomatoes');
-const results = await dataset.classify();
-
-console.log(results[0].answers);
+```python
+dataset = hfjev('meta-llama/Llama-2-7b', hf_token=os.environ['HF_TOKEN'], api_key=os.environ['TYPESAFE_API_KEY'])
 ```
 
-`hfjev()` loads any Hugging Face dataset, auto-adapts evaluation rubrics to the domain, and classifies each row in a single parallel System One call with calibrated probabilities.
+Pass your Hugging Face User Access Token to authenticate gated or private datasets.
 
 ## Custom dimensions
 
@@ -60,21 +51,28 @@ for row in dataset.stream():
 
 `stream()` yields evaluations row-by-row for live feeds and telemetry without blocking on batch completion.
 
+## Local files and in-memory lists
+
+```python
+# Local JSON, JSONL, or CSV
+local = hfjev('./reviews.json')
+
+# In-memory list of strings or dicts
+custom = hfjev([
+    'The acting was phenomenal throughout.',
+    'Pacing dragged during the second act.'
+])
+```
+
+`hfjev()` detects intent directly from the input type.
+
 ## CLI
 
 ```bash
-# Python CLI
 hfjev cornell-movie-review-data/rotten_tomatoes --limit 5
-
-# Node CLI
-npx hfjev cornell-movie-review-data/rotten_tomatoes --limit 5
 ```
 
-## Repository structure
-
-- `python/`: Python package (`hfjev` on PyPI)
-- `js/`: JavaScript / Node.js package (`hfjev` on npm)
-- `bench/`: Runtime benchmarks comparing speculative fan-out execution latency
+Runs classifications directly from your terminal and prints formatted dimension scores and probabilities.
 
 ## License
 
