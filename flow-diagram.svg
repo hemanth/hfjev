@@ -1,0 +1,174 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 640" width="1000" height="640" style="background:#ffffff; font-family:'Geist Mono', 'SF Mono', Monaco, monospace;">
+  <defs>
+    <style>
+      .hdr { font-size: 11px; font-weight: 700; letter-spacing: 0.16em; fill: #000000; text-transform: uppercase; }
+      .lbl { font-size: 12px; font-weight: 600; fill: #000000; }
+      .sub { font-size: 10px; fill: #555555; }
+      .wht-lbl { font-size: 13px; font-weight: 700; fill: #ffffff; letter-spacing: 0.05em; }
+      .wht-sub { font-size: 10px; fill: #cccccc; }
+      .tag { font-size: 9px; font-weight: 600; fill: #000000; }
+      .stroke-base { stroke: #000000; stroke-width: 1.2px; fill: none; }
+      .stroke-dashed { stroke: #000000; stroke-width: 1.2px; stroke-dasharray: 4,4; fill: none; }
+      .card-white { fill: #ffffff; stroke: #000000; stroke-width: 1.2px; }
+      .card-black { fill: #000000; stroke: #000000; stroke-width: 1.2px; }
+      .badge { fill: #ffffff; stroke: #000000; stroke-width: 1px; }
+    </style>
+  </defs>
+
+  <!-- Title Section -->
+  <text x="40" y="42" class="hdr">HFJEV ARCHITECTURAL SPECIFICATION &amp; SPECULATIVE FAN-OUT BLUEPRINT</text>
+  <line x1="40" y1="54" x2="960" y2="54" class="stroke-base" />
+
+  <!-- 1. INGESTION & DATA SOURCES (LEFT) -->
+  <rect x="40" y="75" width="220" height="520" rx="6" class="card-white" />
+  <text x="55" y="100" class="hdr">1. DATA INGESTION</text>
+
+  <!-- Card 1: Hugging Face Datasets API -->
+  <rect x="55" y="118" width="190" height="135" rx="4" class="card-white" />
+  <text x="70" y="140" class="lbl">Hugging Face Hub API</text>
+  <text x="70" y="158" class="sub">• datasets-server.huggingface.co</text>
+  <text x="70" y="174" class="sub">• Canonical ID Resolution</text>
+  <text x="70" y="190" class="sub">• Splits &amp; Config Extraction</text>
+  <text x="70" y="206" class="sub">• Gated / HF_TOKEN Auth</text>
+  <text x="70" y="224" class="sub">• Auto Text Column Discovery</text>
+  <rect x="175" y="125" width="60" height="18" rx="2" class="badge" />
+  <text x="184" y="137" class="tag">REST API</text>
+
+  <!-- Card 2: Local & In-Memory Formats -->
+  <rect x="55" y="268" width="190" height="145" rx="4" class="card-white" />
+  <text x="70" y="290" class="lbl">Local &amp; Memory Inputs</text>
+  <text x="70" y="310" class="sub">• JSON Array / Records</text>
+  <text x="70" y="326" class="sub">• JSONL Streaming Rows</text>
+  <text x="70" y="342" class="sub">• CSV Delimited Tables</text>
+  <text x="70" y="358" class="sub">• Python list[dict] / list[str]</text>
+  <text x="70" y="374" class="sub">• JS Array&lt;string | object&gt;</text>
+  <rect x="175" y="275" width="60" height="18" rx="2" class="badge" />
+  <text x="180" y="287" class="tag">ZERO-DEP</text>
+
+  <!-- Card 3: Intent Detection -->
+  <rect x="55" y="428" width="190" height="145" rx="4" class="card-white" />
+  <text x="70" y="450" class="lbl">Intent Detection Engine</text>
+  <text x="70" y="470" class="sub">Polymorphic factory hfjev():</text>
+  <text x="70" y="488" class="sub">• File suffix check (.jsonl)</text>
+  <text x="70" y="504" class="sub">• Path presence in filesystem</text>
+  <text x="70" y="520" class="sub">• String Hub slug resolver</text>
+  <text x="70" y="538" class="sub">• Memory sequence wrapper</text>
+
+  <!-- 2. DYNAMIC ADAPTATION (MIDDLE TOP) -->
+  <rect x="290" y="75" width="370" height="235" rx="6" class="card-white" />
+  <text x="305" y="100" class="hdr">2. DYNAMIC DIMENSION ADAPTATION</text>
+
+  <!-- Pack 1: Film / Media Reviews -->
+  <rect x="305" y="118" width="165" height="85" rx="4" class="card-white" />
+  <text x="318" y="138" class="lbl">Film &amp; Media Reviews</text>
+  <text x="318" y="154" class="sub">Choice: fresh / rotten</text>
+  <text x="318" y="170" class="sub">Noul: is_spoiler</text>
+  <text x="318" y="186" class="sub">Score: analytical depth</text>
+
+  <!-- Pack 2: News Beats -->
+  <rect x="480" y="118" width="165" height="85" rx="4" class="card-white" />
+  <text x="493" y="138" class="lbl">News Beats &amp; Editorial</text>
+  <text x="493" y="154" class="sub">Choice: tech/biz/sports/world</text>
+  <text x="493" y="170" class="sub">Noul: sensationalism</text>
+  <text x="493" y="186" class="sub">Score: fact density</text>
+
+  <!-- Pack 3: LLM Instructions -->
+  <rect x="305" y="212" width="165" height="85" rx="4" class="card-white" />
+  <text x="318" y="232" class="lbl">LLM Instruction Tuning</text>
+  <text x="318" y="248" class="sub">Choice: gen/code/math/ext</text>
+  <text x="318" y="264" class="sub">Noul: is_adversarial</text>
+  <text x="318" y="280" class="sub">Score: prompt clarity</text>
+
+  <!-- Pack 4: Support Intent -->
+  <rect x="480" y="212" width="165" height="85" rx="4" class="card-white" />
+  <text x="493" y="232" class="lbl">Support Intent / Triage</text>
+  <text x="493" y="248" class="sub">Noul: is_urgent escalation</text>
+  <text x="493" y="264" class="sub">Score: frustration level</text>
+  <text x="493" y="280" class="sub">Noul: is_actionable query</text>
+
+  <!-- 3. INVERTED FOCAL NODE (MIDDLE BOTTOM) -->
+  <rect x="290" y="335" width="370" height="260" rx="6" class="card-black" />
+  <text x="310" y="365" class="wht-lbl">3. TYPESAFE JEV SYSTEM ONE ENGINE</text>
+  <text x="310" y="384" class="wht-sub">SPECULATIVE FAN-OUT ARBITER (REST / IN-TREE SIMULATOR)</text>
+
+  <!-- Focal inner node: Speculative Fan-out -->
+  <rect x="305" y="402" width="340" height="75" rx="4" fill="#18181b" stroke="#3f3f46" stroke-width="1.2" />
+  <text x="320" y="424" fill="#ffffff" font-size="11px" font-weight="700">SINGLE-PASS MULTI-QUESTION BATCHING</text>
+  <text x="320" y="442" fill="#d4d4d8" font-size="10px">• maps all active dimensions into parallel questions map</text>
+  <text x="320" y="458" fill="#d4d4d8" font-size="10px">• 1 HTTP roundtrip per row (zero token-by-token parsing)</text>
+
+  <!-- Focal inner node: Dual Backend Arbiter -->
+  <rect x="305" y="490" width="162" height="90" rx="4" fill="#18181b" stroke="#3f3f46" stroke-width="1.2" />
+  <text x="316" y="512" fill="#ffffff" font-size="10px" font-weight="700">LIVE CLOUD JEV</text>
+  <text x="316" y="528" fill="#a1a1aa" font-size="9px">POST api.typesafe.ai</text>
+  <text x="316" y="544" fill="#a1a1aa" font-size="9px">• Sub-ms model latency</text>
+  <text x="316" y="560" fill="#a1a1aa" font-size="9px">• Calibrated inference</text>
+
+  <rect x="483" y="490" width="162" height="90" rx="4" fill="#18181b" stroke="#3f3f46" stroke-width="1.2" />
+  <text x="494" y="512" fill="#ffffff" font-size="10px" font-weight="700">IN-TREE SIMULATOR</text>
+  <text x="494" y="528" fill="#a1a1aa" font-size="9px">0.015 ms/row latency</text>
+  <text x="494" y="544" fill="#a1a1aa" font-size="9px">• 100% offline &amp; testable</text>
+  <text x="494" y="560" fill="#a1a1aa" font-size="9px">• Calibrated distribution</text>
+
+  <!-- 4. OUTPUTS & CONSUMERS (RIGHT) -->
+  <rect x="690" y="75" width="270" height="520" rx="6" class="card-white" />
+  <text x="705" y="100" class="hdr">4. TYPED PRIMITIVES &amp; APIS</text>
+
+  <!-- Typed Primitive 1: Choice -->
+  <rect x="705" y="118" width="240" height="80" rx="4" class="card-white" />
+  <text x="718" y="138" class="lbl">Choice Primitive</text>
+  <text x="718" y="154" class="sub">{ choice: "tech", confidence: 0.88 }</text>
+  <text x="718" y="170" class="sub">probabilities: { tech: 0.88, biz: 0.04... }</text>
+  <rect x="880" y="125" width="55" height="18" rx="2" class="badge" />
+  <text x="886" y="137" class="tag">DISCRETE</text>
+
+  <!-- Typed Primitive 2: Noul -->
+  <rect x="705" y="206" width="240" height="75" rx="4" class="card-white" />
+  <text x="718" y="226" class="lbl">Noul Primitive (Calibrated Gate)</text>
+  <text x="718" y="242" class="sub">{ noul: 0.942 } ❯ P(condition = true)</text>
+  <text x="718" y="258" class="sub">Programmatic thresholding &amp; triage</text>
+  <rect x="880" y="213" width="55" height="18" rx="2" class="badge" />
+  <text x="887" y="225" class="tag">[0, 1]</text>
+
+  <!-- Typed Primitive 3: Score -->
+  <rect x="705" y="290" width="240" height="75" rx="4" class="card-white" />
+  <text x="718" y="310" class="lbl">Score Primitive (Continuous)</text>
+  <text x="718" y="326" class="sub">{ score: 2.34, confidence: 0.85 }</text>
+  <text x="718" y="342" class="sub">Weighted position along ordered criteria</text>
+  <rect x="880" y="297" width="55" height="18" rx="2" class="badge" />
+  <text x="886" y="309" class="tag">LEVELS</text>
+
+  <!-- Runtime Delivery -->
+  <rect x="705" y="375" width="240" height="205" rx="4" class="card-white" />
+  <text x="718" y="398" class="lbl">Dual SDK Delivery</text>
+  <text x="718" y="418" class="sub" style="font-weight:600; fill:#000;">Python (pip install hfjev):</text>
+  <text x="718" y="434" class="sub">import hfjev; ds = hfjev('ag_news')</text>
+  <text x="718" y="450" class="sub">results = ds.classify() / ds.stream()</text>
+
+  <line x1="718" y1="464" x2="930" y2="464" class="stroke-base" />
+
+  <text x="718" y="484" class="sub" style="font-weight:600; fill:#000;">Node.js (npm install hfjev):</text>
+  <text x="718" y="500" class="sub">import hfjev from 'hfjev'</text>
+  <text x="718" y="516" class="sub">const ds = await hfjev('rotten_tomatoes')</text>
+
+  <line x1="718" y1="530" x2="930" y2="530" class="stroke-base" />
+
+  <text x="718" y="550" class="sub" style="font-weight:600; fill:#000;">CLI Command:</text>
+  <text x="718" y="566" class="sub">hfjev &lt;dataset&gt; --limit 5 --simulate</text>
+
+  <!-- ORTHOGONAL CONNECTORS -->
+  <!-- 1 -> 2 -->
+  <path d="M 260 180 L 275 180 Q 282 180 282 185 L 282 195 Q 282 200 290 200" class="stroke-base" />
+  <!-- 1 -> 3 -->
+  <path d="M 260 340 L 275 340 Q 282 340 282 420 Q 282 430 290 430" class="stroke-base" />
+  <!-- 2 -> 3 -->
+  <path d="M 475 310 L 475 335" class="stroke-base" />
+  <!-- 3 -> 4 (Choice) -->
+  <path d="M 660 420 L 675 420 Q 682 420 682 165 Q 682 155 705 155" class="stroke-base" />
+  <!-- 3 -> 4 (Noul) -->
+  <path d="M 660 445 L 680 445 Q 685 445 685 250 Q 685 240 705 240" class="stroke-base" />
+  <!-- 3 -> 4 (Score) -->
+  <path d="M 660 470 L 675 470 Q 682 470 682 330 Q 682 325 705 325" class="stroke-base" />
+  <!-- 3 -> 4 (SDKs) -->
+  <path d="M 660 515 L 705 515" class="stroke-base" />
+</svg>
