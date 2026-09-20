@@ -514,8 +514,8 @@ export function getDynamicDimensionsForDataset(
   features: Array<{ name: string; type: string }> = [],
   sampleRow?: Record<string, any>
 ): { packName: string; dimensions: Dimension[] } {
-  const dsLower = datasetId.toLowerCase();
-  const featNames = features.map(f => f.name.toLowerCase());
+  const dsLower = String(datasetId || '').toLowerCase();
+  const featNames = (features || []).map(f => String(f?.name ?? '').toLowerCase());
 
   // 1. Direct preset match
   const preset = PRESET_DATASETS.find(p => p.id.toLowerCase() === dsLower);
