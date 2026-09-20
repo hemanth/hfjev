@@ -1,0 +1,10 @@
+{
+  "name": "hfjev-monorepo",
+  "private": true,
+  "scripts": {
+    "test:js": "npm --prefix js test",
+    "dev": "npm --prefix playground run dev",
+    "build:playground": "npm --prefix playground run build && cp -r playground/dist/* docs/",
+    "bench": "npm --prefix bench start"
+  }
+}

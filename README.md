@@ -70,10 +70,22 @@ hfjev cornell-movie-review-data/rotten_tomatoes --limit 5
 npx hfjev cornell-movie-review-data/rotten_tomatoes --limit 5
 ```
 
+## Interactive Studio / Playground
+
+Launch the interactive web studio to import, inspect, classify, and export Hugging Face datasets:
+👉 **[https://hemanth.github.io/hfjev/](https://hemanth.github.io/hfjev/)**
+
+- **Dataset Import**: Search & load any dataset or split from the Hugging Face Hub, or upload local CSV / JSON / JSONL files.
+- **Dynamic Dimension Adaptation**: Auto-detect domain rubrics or customize Choice, Noul, and Score primitives.
+- **Real-Time Classification**: Execute single-row inspections or parallel batch evaluations with calibrated probabilities and zero hallucinated tokens.
+- **Data Export**: Export enriched datasets with all evaluation scores and token telemetry to CSV, JSON, or JSONL.
+
 ## Repository structure
 
 - `python/`: Python package (`hfjev` on PyPI)
 - `js/`: JavaScript / Node.js package (`hfjev` on npm)
+- `playground/`: Interactive React 19 Studio & Playground source code
+- `docs/`: Built static studio web app deployed to GitHub Pages
 - `bench/`: Runtime benchmarks comparing speculative fan-out execution latency
 
 ## License

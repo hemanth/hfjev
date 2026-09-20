@@ -1,0 +1,146 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 520" width="1000" height="520" style="background:#ffffff; font-family:'Geist Mono', 'SF Mono', Monaco, monospace;">
+  <defs>
+    <style>
+      .hdr { font-size: 10px; font-weight: 700; letter-spacing: 0.16em; fill: #000000; text-transform: uppercase; }
+      .lbl { font-size: 12px; font-weight: 600; fill: #000000; }
+      .sub { font-size: 9.5px; fill: #555555; }
+      .wht-lbl { font-size: 13px; font-weight: 700; fill: #ffffff; letter-spacing: 0.04em; }
+      .wht-sub { font-size: 10px; fill: #d4d4d8; }
+      .tag { font-size: 8px; font-weight: 700; fill: #000000; letter-spacing: 0.06em; }
+      .wht-tag { font-size: 8px; font-weight: 700; fill: #ffffff; letter-spacing: 0.06em; }
+      .stroke-base { stroke: #000000; stroke-width: 1.2px; fill: none; }
+      .stroke-dashed { stroke: #000000; stroke-width: 1px; stroke-dasharray: 4,4; fill: none; }
+      .card-white { fill: #ffffff; stroke: #000000; stroke-width: 1.2px; }
+      .card-black { fill: #000000; stroke: #000000; stroke-width: 1.2px; }
+      .badge { fill: #ffffff; stroke: #000000; stroke-width: 0.8px; }
+      .badge-black { fill: #000000; stroke: #ffffff; stroke-width: 0.8px; }
+    </style>
+  </defs>
+
+  <!-- TITLE BAR -->
+  <text x="40" y="36" class="hdr">HFJEV ARCHITECTURAL EXECUTION &amp; SPECULATIVE FAN-OUT BLUEPRINT</text>
+  <line x1="40" y1="46" x2="960" y2="46" class="stroke-base" />
+
+  <!-- CLUSTER 1: INGESTION -->
+  <rect x="40" y="66" width="200" height="424" rx="8" class="stroke-dashed" />
+  <text x="54" y="90" class="hdr">1. DATA INGESTION</text>
+
+  <!-- Card 1.1: HF Hub -->
+  <rect x="54" y="106" width="172" height="74" rx="6" class="card-white" />
+  <rect x="64" y="116" width="56" height="15" rx="3" class="badge" />
+  <text x="92" y="127" class="tag" text-anchor="middle">HUB API</text>
+  <text x="64" y="148" class="lbl">Hugging Face Hub</text>
+  <text x="64" y="166" class="sub">REST · Datasets Server</text>
+
+  <!-- Card 1.2: Local Files -->
+  <rect x="54" y="196" width="172" height="74" rx="6" class="card-white" />
+  <rect x="64" y="206" width="62" height="15" rx="3" class="badge" />
+  <text x="95" y="217" class="tag" text-anchor="middle">SOURCES</text>
+  <text x="64" y="238" class="lbl">Files &amp; Arrays</text>
+  <text x="64" y="256" class="sub">JSON · JSONL · CSV · Lists</text>
+
+  <!-- Card 1.3: Polymorphic Loader -->
+  <rect x="54" y="286" width="172" height="74" rx="6" class="card-white" />
+  <rect x="64" y="296" width="60" height="15" rx="3" class="badge" />
+  <text x="94" y="307" class="tag" text-anchor="middle">FACTORY</text>
+  <text x="64" y="328" class="lbl">hfjev() Loader</text>
+  <text x="64" y="346" class="sub">Polymorphic Intent Engine</text>
+
+  <!-- CLUSTER 2: ADAPTATION -->
+  <rect x="270" y="66" width="195" height="424" rx="8" class="stroke-base" />
+  <text x="284" y="90" class="hdr">2. DYNAMIC ADAPTATION</text>
+
+  <!-- Card 2.1: Domain Packs -->
+  <rect x="284" y="106" width="167" height="110" rx="6" class="card-white" />
+  <rect x="294" y="116" width="76" height="15" rx="3" class="badge" />
+  <text x="332" y="127" class="tag" text-anchor="middle">DOMAIN PACKS</text>
+  <text x="294" y="148" class="lbl">Automatic Rubrics</text>
+  <text x="294" y="166" class="sub">• Film &amp; Media Reviews</text>
+  <text x="294" y="182" class="sub">• News Beats &amp; Editorial</text>
+  <text x="294" y="198" class="sub">• LLM Prompts &amp; Support</text>
+
+  <!-- Card 2.2: Custom Overrides -->
+  <rect x="284" y="232" width="167" height="84" rx="6" class="card-white" />
+  <rect x="294" y="242" width="60" height="15" rx="3" class="badge" />
+  <text x="324" y="253" class="tag" text-anchor="middle">BUILDER</text>
+  <text x="294" y="274" class="lbl">.adapt() Method</text>
+  <text x="294" y="292" class="sub">Custom Primitives &amp; Rules</text>
+
+  <!-- CLUSTER 3: THE INVERTED FOCAL ARBITER -->
+  <rect x="495" y="66" width="225" height="424" rx="8" class="card-black" />
+  <text x="512" y="92" class="wht-lbl">3. SYSTEM ONE ARBITER</text>
+  <text x="512" y="108" class="wht-sub">SPECULATIVE FAN-OUT ENGINE</text>
+
+  <!-- Focal Card: Speculative Fan-out -->
+  <rect x="510" y="130" width="195" height="140" rx="6" fill="#18181b" stroke="#3f3f46" stroke-width="1" />
+  <rect x="522" y="142" width="130" height="16" rx="3" class="badge-black" />
+  <text x="587" y="153" class="wht-tag" text-anchor="middle">PARALLEL EVALUATION</text>
+  <text x="522" y="178" fill="#ffffff" font-size="12px" font-weight="700">Single-Pass Execution</text>
+  <text x="522" y="198" fill="#a1a1aa" font-size="9.5px">• 1 HTTP request per row</text>
+  <text x="522" y="216" fill="#a1a1aa" font-size="9.5px">• All active dimensions</text>
+  <text x="522" y="234" fill="#a1a1aa" font-size="9.5px">• Zero token generation</text>
+  <text x="522" y="252" fill="#34d399" font-size="9.5px" font-weight="600">Deterministic [0, 1] Calibrated</text>
+
+  <!-- Focal Sub-node: Dual Backend -->
+  <rect x="510" y="286" width="195" height="96" rx="6" fill="#18181b" stroke="#3f3f46" stroke-width="1" />
+  <rect x="522" y="298" width="94" height="16" rx="3" class="badge-black" />
+  <text x="569" y="309" class="wht-tag" text-anchor="middle">DUAL BACKEND</text>
+  <text x="522" y="334" fill="#ffffff" font-size="11.5px" font-weight="600">Cloud &amp; In-Tree</text>
+  <text x="522" y="352" fill="#a1a1aa" font-size="9.5px">Cloud API · ~12 ms/row</text>
+  <text x="522" y="368" fill="#a1a1aa" font-size="9.5px">Local Sim · 0.015 ms/row</text>
+
+  <!-- CLUSTER 4: TYPED OUTPUTS & SDks -->
+  <rect x="750" y="66" width="210" height="424" rx="8" class="stroke-dashed" />
+  <text x="764" y="90" class="hdr">4. PRIMITIVES &amp; SDKS</text>
+
+  <!-- Card 4.1: Choice -->
+  <rect x="764" y="106" width="182" height="66" rx="6" class="card-white" />
+  <rect x="774" y="114" width="60" height="14" rx="3" class="badge" />
+  <text x="804" y="124" class="tag" text-anchor="middle">DISCRETE</text>
+  <text x="774" y="142" class="lbl">Choice Primitive</text>
+  <text x="774" y="158" class="sub">Normalized Probabilities</text>
+
+  <!-- Card 4.2: Noul -->
+  <rect x="764" y="180" width="182" height="66" rx="6" class="card-white" />
+  <rect x="774" y="188" width="68" height="14" rx="3" class="badge" />
+  <text x="808" y="198" class="tag" text-anchor="middle">GATE [0, 1]</text>
+  <text x="774" y="216" class="lbl">Noul Primitive</text>
+  <text x="774" y="232" class="sub">Calibrated Probability Gate</text>
+
+  <!-- Card 4.3: Score -->
+  <rect x="764" y="254" width="182" height="66" rx="6" class="card-white" />
+  <rect x="774" y="262" width="56" height="14" rx="3" class="badge" />
+  <text x="802" y="272" class="tag" text-anchor="middle">LEVELS</text>
+  <text x="774" y="290" class="lbl">Score Primitive</text>
+  <text x="774" y="306" class="sub">Continuous Rubric Scale</text>
+
+  <!-- Card 4.4: Dual SDKs -->
+  <rect x="764" y="328" width="182" height="144" rx="6" class="card-white" />
+  <rect x="774" y="338" width="66" height="14" rx="3" class="badge" />
+  <text x="807" y="348" class="tag" text-anchor="middle">RUNTIMES</text>
+  <text x="774" y="368" class="lbl">Dual SDK Delivery</text>
+  <text x="774" y="390" class="sub" style="font-weight:700; fill:#000;">Python (pip install hfjev)</text>
+  <text x="774" y="406" class="sub">import hfjev; classify()</text>
+  <text x="774" y="428" class="sub" style="font-weight:700; fill:#000;">Node.js (npm install hfjev)</text>
+  <text x="774" y="444" class="sub">import hfjev from 'hfjev'</text>
+  <text x="774" y="460" class="sub">CLI: hfjev &lt;dataset&gt;</text>
+
+  <!-- CLEAN ORTHOGONAL ROUTING -->
+  <!-- Ingestion to Adaptation -->
+  <path d="M 226 233 L 248 233 Q 255 233 255 200 L 255 161 Q 255 161 284 161" class="stroke-base" />
+  <path d="M 226 323 L 255 323 Q 262 323 262 300 L 262 274 Q 262 274 284 274" class="stroke-base" />
+
+  <!-- Adaptation to Inverted Arbiter -->
+  <path d="M 451 161 L 473 161 Q 480 161 480 175 L 480 200 Q 480 200 510 200" class="stroke-base" />
+  <path d="M 451 274 L 473 274 Q 480 274 480 230 L 480 200 Q 480 200 510 200" class="stroke-base" />
+
+  <!-- Inverted Arbiter to Outputs -->
+  <!-- to Choice -->
+  <path d="M 705 180 L 728 180 Q 736 180 736 150 L 736 139 Q 736 139 764 139" class="stroke-base" />
+  <!-- to Noul -->
+  <path d="M 705 200 L 736 200 Q 744 200 744 213 L 744 213 Q 744 213 764 213" class="stroke-base" />
+  <!-- to Score -->
+  <path d="M 705 220 L 728 220 Q 736 220 736 260 L 736 287 Q 736 287 764 287" class="stroke-base" />
+  <!-- to SDKs -->
+  <path d="M 705 334 L 728 334 Q 736 334 736 370 L 736 400 Q 736 400 764 400" class="stroke-base" />
+</svg>
