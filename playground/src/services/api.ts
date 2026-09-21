@@ -19,9 +19,17 @@ export async function getWebMLKitEngine(model: string = 'qwen3-0.6b'): Promise<D
       webmlKitEngine = createDecisionEngine({
         model: model as any,
         modelUrl: 'https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/main/qwen2.5-0.5b-instruct-q4_k_m.gguf',
+        wasmPaths: {
+          default: 'https://cdn.jsdelivr.net/npm/@wllama/wllama@3.6.1/esm/wasm/wllama.wasm',
+          'single-thread/wllama.wasm': 'https://cdn.jsdelivr.net/npm/@wllama/wllama@3.6.1/esm/wasm/wllama.wasm',
+          'multi-thread/wllama.wasm': 'https://cdn.jsdelivr.net/npm/@wllama/wllama@3.6.1/esm/wasm/wllama.wasm',
+        },
         mode: 'auto'
       });
-      await webmlKitEngine.init();
+      await Promise.race([
+        webmlKitEngine.init(),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('WebML-Kit initialization timed out')), 25000))
+      ]);
       currentWebmlModel = model;
     } catch (err) {
       console.warn('WebML-Kit on-device model load failed or timed out, falling back to client heuristic engine:', err);
@@ -40,82 +48,91 @@ export async function evaluateRowWithWebMLKit(
 ) {
   const startTime = performance.now();
   try {
-    const engine = await getWebMLKitEngine(model);
-    const answers: Record<string, any> = {};
+    const runEvaluation = async () => {
+      const engine = await getWebMLKitEngine(model);
+      const answers: Record<string, any> = {};
 
-    const stateStr = typeof state === 'string' ? state : JSON.stringify(state);
-    let totalInputTokens = Math.max(20, Math.floor(stateStr.length / 3.8));
-    let totalOutputTokens = 0;
+      const stateStr = typeof state === 'string' ? state : JSON.stringify(state);
+      let totalInputTokens = Math.max(20, Math.floor(stateStr.length / 3.8));
+      let totalOutputTokens = 0;
 
-    for (const [qId, qDef] of Object.entries(questions)) {
-      const qType = qDef.type;
-      const instructions = typeof qDef.instructions === 'string'
-        ? qDef.instructions
-        : JSON.stringify(qDef.instructions || '');
+      for (const [qId, qDef] of Object.entries(questions)) {
+        const qType = qDef.type;
+        const instructions = typeof qDef.instructions === 'string'
+          ? qDef.instructions
+          : JSON.stringify(qDef.instructions || '');
 
-      if (qType === 'choice') {
-        const criteria = qDef.criteria || {};
-        const options = Object.keys(criteria).length >= 2
-          ? criteria
-          : (qDef.options && qDef.options.length >= 2 ? qDef.options : { positive: 'Positive', negative: 'Negative', neutral: 'Neutral' });
+        if (qType === 'choice') {
+          const criteria = qDef.criteria || {};
+          const options = Object.keys(criteria).length >= 2
+            ? criteria
+            : (qDef.options && qDef.options.length >= 2 ? qDef.options : { positive: 'Positive', negative: 'Negative', neutral: 'Neutral' });
 
-        const res = await engine.choice({
-          state,
-          question: instructions,
-          options
-        });
+          const res = await engine.choice({
+            state,
+            question: instructions,
+            options
+          });
 
-        answers[qId] = {
-          type: 'choice',
-          choice: res.choice,
-          probabilities: res.probabilities,
-          confidence: res.confidence
-        };
-        totalOutputTokens += 32;
-      } else if (qType === 'noul') {
-        const res = await engine.noul({
-          state,
-          statement: instructions,
-          threshold: 0.5
-        });
+          answers[qId] = {
+            type: 'choice',
+            choice: res.choice,
+            probabilities: res.probabilities,
+            confidence: res.confidence
+          };
+          totalOutputTokens += 32;
+        } else if (qType === 'noul') {
+          const res = await engine.noul({
+            state,
+            statement: instructions,
+            threshold: 0.5
+          });
 
-        answers[qId] = {
-          type: 'noul',
-          noul: res.noul
-        };
-        totalOutputTokens += 18;
-      } else if (qType === 'score') {
-        const criteria = qDef.criteria || qDef.levels || ['Low', 'Moderate', 'High'];
-        const res = await engine.score({
-          state,
-          instructions,
-          criteria
-        });
+          answers[qId] = {
+            type: 'noul',
+            noul: res.noul
+          };
+          totalOutputTokens += 18;
+        } else if (qType === 'score') {
+          const criteria = qDef.criteria || qDef.levels || ['Low', 'Moderate', 'High'];
+          const res = await engine.score({
+            state,
+            instructions,
+            criteria
+          });
 
-        answers[qId] = {
-          type: 'score',
-          score: res.score,
-          legend: qDef.legend || ['Low', 'Moderate', 'High'],
-          probabilities: res.probabilities,
-          confidence: res.confidence
-        };
-        totalOutputTokens += 24;
+          answers[qId] = {
+            type: 'score',
+            score: res.score,
+            legend: qDef.legend || ['Low', 'Moderate', 'High'],
+            probabilities: res.probabilities,
+            confidence: res.confidence
+          };
+          totalOutputTokens += 24;
+        }
       }
-    }
 
-    const latencyMs = Math.round(performance.now() - startTime);
+      const latencyMs = Math.round(performance.now() - startTime);
 
-    return {
-      model: `webml-kit (${model})`,
-      answers,
-      usage: {
-        input_tokens: totalInputTokens,
-        output_tokens: totalOutputTokens
-      },
-      latencyMs,
-      isSimulated: false,
-      engine: 'webml-kit'
+      return {
+        model: `webml-kit (${model})`,
+        answers,
+        usage: {
+          input_tokens: totalInputTokens,
+          output_tokens: totalOutputTokens
+        },
+        latencyMs,
+        isSimulated: false,
+        engine: 'webml-kit'
+      };
     };
+
+    return await Promise.race([
+      runEvaluation(),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('WebML-Kit evaluation exceeded safety timeout')), 35000)
+      )
+    ]);
   } catch (err: any) {
     console.warn('WebML-Kit execution encountered an error, falling back to simulated inference:', err);
     const sim = simulateJevEvaluation(state, questions);
