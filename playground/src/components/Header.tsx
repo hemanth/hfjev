@@ -19,6 +19,8 @@ export const Header: React.FC<HeaderProps> = ({
   onChangeView,
   apiKey,
   isSimulated,
+  engineMode = 'simulated',
+  webmlModel,
   hfToken,
   onOpenApiKeyModal,
   totalEvaluated,
