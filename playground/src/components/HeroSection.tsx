@@ -80,6 +80,7 @@ hfjev cornell-movie-review-data/rotten_tomatoes --limit 10`;
           <div className="mt-7 flex flex-wrap items-center gap-3">
             <button
               onClick={onScrollToStudio}
+              data-testid="hero-launch-studio-btn"
               className="micro-sheen inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-ink-900 text-white font-semibold text-xs shadow-soft-md hover:bg-ink-800 active:scale-[0.98] transition-all"
             >
               <span>Launch Classifier Studio</span>
