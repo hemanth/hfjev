@@ -1,6 +1,7 @@
 import React from 'react';
-import { Play, Pause, RotateCcw, Download, Sparkles, Clock, CheckCircle2, Zap, AlertCircle } from 'lucide-react';
+import { Play, Pause, RotateCcw, Download, Sparkles, Clock, CheckCircle2, Zap, AlertCircle, Cpu } from 'lucide-react';
 import { PastelBadge } from './PastelBadge';
+import { type ExecutionEngine } from '../services/api';
 
 interface BatchControlsProps {
   totalRows: number;
@@ -14,6 +15,10 @@ interface BatchControlsProps {
   totalTokens: { input_tokens: number; output_tokens: number };
   avgLatencyMs: number;
   isSimulated: boolean;
+  engineMode?: ExecutionEngine;
+  onChangeEngineMode?: (mode: ExecutionEngine) => void;
+  webmlModel?: string;
+  onChangeWebmlModel?: (model: string) => void;
 }
 
 export const BatchControls: React.FC<BatchControlsProps> = ({
@@ -28,6 +33,10 @@ export const BatchControls: React.FC<BatchControlsProps> = ({
   totalTokens,
   avgLatencyMs,
   isSimulated,
+  engineMode = 'simulated',
+  onChangeEngineMode,
+  webmlModel = 'qwen3-0.6b',
+  onChangeWebmlModel,
 }) => {
   const percent = totalRows > 0 ? Math.round((completedRows / totalRows) * 100) : 0;
   const isDone = totalRows > 0 && completedRows === totalRows;
@@ -85,9 +94,69 @@ export const BatchControls: React.FC<BatchControlsProps> = ({
             )}
           </div>
 
+          {/* Engine Selector */}
+          <div className="flex flex-wrap items-center gap-2 text-xs font-mono">
+            <span className="text-[11px] text-ink-500 font-sans font-medium">Engine:</span>
+            <div className="inline-flex rounded-lg bg-ink-100/80 p-0.5 border border-ink-200/60">
+              <button
+                type="button"
+                onClick={() => onChangeEngineMode?.('simulated')}
+                className={`px-2.5 py-1 rounded-md text-[11px] transition ${
+                  engineMode === 'simulated'
+                    ? 'bg-white text-ink-900 font-semibold shadow-soft-xs'
+                    : 'text-ink-600 hover:text-ink-900'
+                }`}
+              >
+                Simulated
+              </button>
+              <button
+                type="button"
+                onClick={() => onChangeEngineMode?.('webml-kit')}
+                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] transition ${
+                  engineMode === 'webml-kit'
+                    ? 'bg-pastel-lavender text-pastel-lavender-text font-semibold shadow-soft-xs'
+                    : 'text-ink-600 hover:text-ink-900'
+                }`}
+              >
+                <Cpu size={12} />
+                <span>webml-kit (WebGPU)</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => onChangeEngineMode?.('cloud-api')}
+                className={`px-2.5 py-1 rounded-md text-[11px] transition ${
+                  engineMode === 'cloud-api'
+                    ? 'bg-white text-ink-900 font-semibold shadow-soft-xs'
+                    : 'text-ink-600 hover:text-ink-900'
+                }`}
+              >
+                Cloud API
+              </button>
+            </div>
+
+            {engineMode === 'webml-kit' && (
+              <select
+                value={webmlModel || 'qwen3-0.6b'}
+                onChange={(e) => onChangeWebmlModel?.(e.target.value)}
+                className="text-[11px] font-mono px-2 py-1 rounded-md border border-pastel-lavender-border bg-white text-ink-800 focus:outline-none focus:ring-1 focus:ring-[#7C66DC] cursor-pointer"
+              >
+                <option value="qwen3-0.6b">qwen3-0.6b (Fast / 480MB)</option>
+                <option value="minicpm5-2b">minicpm5-2b (Desktop / 1.2GB)</option>
+              </select>
+            )}
+          </div>
+
           {/* Quick Stats Summary */}
           <div className="flex flex-wrap items-center gap-3 text-xs text-ink-600">
-            {isSimulated && (
+            {engineMode === 'webml-kit' ? (
+              <PastelBadge color="lavender" size="sm">
+                webml-kit WebGPU ({webmlModel})
+              </PastelBadge>
+            ) : engineMode === 'cloud-api' ? (
+              <PastelBadge color="mint" size="sm">
+                TypeSafe Cloud API
+              </PastelBadge>
+            ) : (
               <PastelBadge color="butter" size="sm">
                 Calibrated Simulation
               </PastelBadge>

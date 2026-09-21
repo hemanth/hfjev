@@ -14,7 +14,7 @@ import { ApiKeyModal } from './components/ApiKeyModal';
 import { PRESET_DATASETS, PRESET_DIMENSION_PACKS, getDynamicDimensionsForDataset } from './data/presets';
 import { DatasetRow, Dimension, DimensionPack, RowEvaluation } from './types';
 import { Table, BarChart2, AlertCircle, Sparkles, Wand2, X, Database, Sliders, RefreshCw } from 'lucide-react';
-import { fetchHfRows, evaluateRow } from './services/api';
+import { fetchHfRows, evaluateRow, type ExecutionEngine } from './services/api';
 
 export function App() {
   // View routing ('docs' | 'studio') based on URL hash
@@ -57,10 +57,34 @@ export function App() {
   // API Key & Simulation state
   const [apiKey, setApiKey] = useState<string>(() => localStorage.getItem('typesafe_api_key') || '');
   const [hfToken, setHfToken] = useState<string>(() => localStorage.getItem('hf_token') || '');
+  const [engineMode, setEngineMode] = useState<ExecutionEngine>(() => {
+    const saved = localStorage.getItem('typesafe_engine_mode') as ExecutionEngine | null;
+    if (saved && ['simulated', 'webml-kit', 'cloud-api'].includes(saved)) return saved;
+    const legacySim = localStorage.getItem('typesafe_simulate');
+    if (legacySim === 'false' && localStorage.getItem('typesafe_api_key')) return 'cloud-api';
+    return 'simulated';
+  });
+  const [webmlModel, setWebmlModel] = useState<string>(() => {
+    return localStorage.getItem('webml_model') || 'qwen3-0.6b';
+  });
   const [isSimulated, setIsSimulated] = useState<boolean>(() => {
     const saved = localStorage.getItem('typesafe_simulate');
     return saved !== null ? saved === 'true' : !localStorage.getItem('typesafe_api_key');
   });
+
+  const handleSetEngineMode = (mode: ExecutionEngine) => {
+    setEngineMode(mode);
+    localStorage.setItem('typesafe_engine_mode', mode);
+    const sim = mode === 'simulated';
+    setIsSimulated(sim);
+    localStorage.setItem('typesafe_simulate', String(sim));
+  };
+
+  const handleSetWebmlModel = (model: string) => {
+    setWebmlModel(model);
+    localStorage.setItem('webml_model', model);
+  };
+
   const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState(false);
   const [apiKeyModalTab, setApiKeyModalTab] = useState<'typesafe' | 'huggingface'>('typesafe');
 
@@ -312,7 +336,9 @@ export function App() {
         questions,
         model: 'jev-latest',
         apiKey,
-        simulate: isSimulated
+        engine: engineMode,
+        webmlModel,
+        simulate: engineMode === 'simulated'
       });
 
       setRows(prev => prev.map(r => {
@@ -385,7 +411,9 @@ export function App() {
           questions,
           model: 'jev-latest',
           apiKey,
-          simulate: isSimulated,
+          engine: engineMode,
+          webmlModel,
+          simulate: engineMode === 'simulated',
           signal: abortControllerRef.current.signal
         });
 
@@ -451,6 +479,8 @@ export function App() {
         onChangeView={handleViewChange}
         apiKey={apiKey}
         isSimulated={isSimulated}
+        engineMode={engineMode}
+        webmlModel={webmlModel}
         hfToken={hfToken}
         onOpenApiKeyModal={(tab) => {
           setApiKeyModalTab(tab || 'typesafe');
@@ -684,6 +714,10 @@ export function App() {
               totalTokens={totalTokens}
               avgLatencyMs={avgLatencyMs}
               isSimulated={isSimulated}
+              engineMode={engineMode}
+              onChangeEngineMode={handleSetEngineMode}
+              webmlModel={webmlModel}
+              onChangeWebmlModel={handleSetWebmlModel}
             />
           </div>
 
@@ -826,6 +860,10 @@ export function App() {
         onSaveHfToken={handleSaveHfToken}
         isSimulated={isSimulated}
         onToggleSimulated={handleToggleSimulated}
+        engineMode={engineMode}
+        onChangeEngineMode={handleSetEngineMode}
+        webmlModel={webmlModel}
+        onChangeWebmlModel={handleSetWebmlModel}
         initialTab={apiKeyModalTab}
       />
     </div>

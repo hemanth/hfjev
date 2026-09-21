@@ -1,11 +1,13 @@
-import React from 'react';
-import { Key } from 'lucide-react';
+import { Key, Cpu } from 'lucide-react';
+import { type ExecutionEngine } from '../services/api';
 
 interface HeaderProps {
   currentView: 'docs' | 'studio';
   onChangeView: (view: 'docs' | 'studio') => void;
   apiKey: string;
   isSimulated: boolean;
+  engineMode?: ExecutionEngine;
+  webmlModel?: string;
   hfToken?: string;
   onOpenApiKeyModal: (tab?: 'typesafe' | 'huggingface') => void;
   activeDatasetName: string;
@@ -73,16 +75,22 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             onClick={() => onOpenApiKeyModal()}
             className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 font-medium transition ${
-              apiKey && !isSimulated
+              engineMode === 'webml-kit'
+                ? 'border-pastel-lavender-border bg-pastel-lavender text-pastel-lavender-text hover:bg-pastel-lavender-hover'
+                : (engineMode === 'cloud-api' || (apiKey && !isSimulated))
                 ? 'border-emerald-300 bg-emerald-50 text-emerald-900 hover:bg-emerald-100'
                 : 'border-ink-200 bg-white text-ink-700 hover:bg-ink-50'
             }`}
             title="Configure API credentials and tokens"
           >
-            <Key size={12} className={apiKey && !isSimulated ? "text-emerald-700" : "text-ink-500"} />
-            <span>Keys</span>
-            <span className="text-[10px] text-ink-400">
-              {apiKey && !isSimulated ? 'live' : 'sim'}
+            {engineMode === 'webml-kit' ? (
+              <Cpu size={12} className="text-[#4D3DB5]" />
+            ) : (
+              <Key size={12} className={(engineMode === 'cloud-api' || (apiKey && !isSimulated)) ? "text-emerald-700" : "text-ink-500"} />
+            )}
+            <span>Engine</span>
+            <span className="text-[10px] font-mono opacity-80">
+              {engineMode === 'webml-kit' ? 'webml' : (engineMode === 'cloud-api' || (apiKey && !isSimulated)) ? 'live' : 'sim'}
             </span>
             {hfToken && (
               <span className="w-1.5 h-1.5 rounded-full bg-peach-600" title="HF Token Active"></span>

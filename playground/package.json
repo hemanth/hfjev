@@ -19,7 +19,8 @@
     "lucide-react": "^1.16.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "tailwind-merge": "^3.0.2"
+    "tailwind-merge": "^3.0.2",
+    "webml-kit": "^0.4.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",

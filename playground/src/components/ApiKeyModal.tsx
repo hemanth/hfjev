@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Key, Check, AlertCircle, ExternalLink, X, ShieldCheck, Eye, EyeOff } from 'lucide-react';
+import { Key, Check, AlertCircle, ExternalLink, X, ShieldCheck, Eye, EyeOff, Cpu } from 'lucide-react';
 import { PastelBadge } from './PastelBadge';
-import { evaluateRow } from '../services/api';
+import { evaluateRow, type ExecutionEngine } from '../services/api';
 
 interface ApiKeyModalProps {
   isOpen: boolean;
@@ -12,6 +12,10 @@ interface ApiKeyModalProps {
   onSaveHfToken: (token: string) => void;
   isSimulated: boolean;
   onToggleSimulated: (simulate: boolean) => void;
+  engineMode?: ExecutionEngine;
+  onChangeEngineMode?: (mode: ExecutionEngine) => void;
+  webmlModel?: string;
+  onChangeWebmlModel?: (model: string) => void;
   initialTab?: 'typesafe' | 'huggingface';
 }
 
@@ -24,6 +28,10 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
   onSaveHfToken,
   isSimulated,
   onToggleSimulated,
+  engineMode = 'simulated',
+  onChangeEngineMode,
+  webmlModel = 'qwen3-0.6b',
+  onChangeWebmlModel,
   initialTab = 'typesafe',
 }) => {
   const [inputKey, setInputKey] = useState(apiKey);
@@ -174,23 +182,85 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({
                 </p>
               </div>
 
-              {/* Simulation Mode Toggle */}
-              <div className="rounded-xl bg-pastel-lavender/50 border border-pastel-lavender-border p-3.5">
-                <div className="flex items-center justify-between gap-3">
-                  <div>
-                    <div className="text-xs font-semibold text-ink-900">In-Browser Calibrated Simulation</div>
-                    <div className="text-[11px] text-ink-600 mt-0.5">
-                      Deterministic Jev evaluation running 100% client-side with calibrated confidence distributions (no API credits used).
-                    </div>
+              {/* Execution Engine Selector */}
+              <div className="rounded-xl bg-pastel-lavender/40 border border-pastel-lavender-border p-4 space-y-3">
+                <div>
+                  <div className="text-xs font-bold text-ink-900">Execution Engine</div>
+                  <div className="text-[11px] text-ink-600 mt-0.5">
+                    Select how dataset samples will be evaluated and classified.
                   </div>
-                  <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                </div>
+
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2.5 text-xs text-ink-800 cursor-pointer p-2 rounded-lg bg-white border border-ink-100 hover:border-pastel-lavender-border transition">
                     <input
-                      type="checkbox"
-                      checked={isSimulated}
-                      onChange={(e) => onToggleSimulated(e.target.checked)}
-                      className="sr-only peer"
+                      type="radio"
+                      name="engineMode"
+                      value="simulated"
+                      checked={engineMode === 'simulated'}
+                      onChange={() => {
+                        onChangeEngineMode?.('simulated');
+                        onToggleSimulated(true);
+                      }}
+                      className="text-[#7C66DC] focus:ring-[#7C66DC]"
                     />
-                    <div className="w-10 h-5 bg-ink-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-ink-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#7C66DC]"></div>
+                    <div>
+                      <div className="font-semibold">Simulated (Default / Offline)</div>
+                      <div className="text-[10px] text-ink-500">Deterministic calibrated semantic heuristics running 100% offline.</div>
+                    </div>
+                  </label>
+
+                  <label className="flex items-center gap-2.5 text-xs text-ink-800 cursor-pointer p-2 rounded-lg bg-white border border-ink-100 hover:border-pastel-lavender-border transition">
+                    <input
+                      type="radio"
+                      name="engineMode"
+                      value="webml-kit"
+                      checked={engineMode === 'webml-kit'}
+                      onChange={() => {
+                        onChangeEngineMode?.('webml-kit');
+                        onToggleSimulated(false);
+                      }}
+                      className="text-[#7C66DC] focus:ring-[#7C66DC]"
+                    />
+                    <div className="flex-1">
+                      <div className="font-semibold flex items-center gap-1.5">
+                        <Cpu size={13} className="text-[#4D3DB5]" />
+                        <span>webml-kit (In-Browser WebGPU / OpenJev)</span>
+                      </div>
+                      <div className="text-[10px] text-ink-500">Executes real OpenJev models directly in browser via WebGPU / WASM.</div>
+                    </div>
+                  </label>
+
+                  {engineMode === 'webml-kit' && (
+                    <div className="pl-6 pt-1 flex items-center gap-2">
+                      <span className="text-[11px] text-ink-600 font-mono">Model:</span>
+                      <select
+                        value={webmlModel}
+                        onChange={(e) => onChangeWebmlModel?.(e.target.value)}
+                        className="text-xs font-mono px-2 py-1 rounded-md border border-pastel-lavender-border bg-white text-ink-800 focus:outline-none focus:ring-1 focus:ring-[#7C66DC]"
+                      >
+                        <option value="qwen3-0.6b">qwen3-0.6b (Fast / 480MB)</option>
+                        <option value="minicpm5-2b">minicpm5-2b (Desktop / 1.2GB)</option>
+                      </select>
+                    </div>
+                  )}
+
+                  <label className="flex items-center gap-2.5 text-xs text-ink-800 cursor-pointer p-2 rounded-lg bg-white border border-ink-100 hover:border-pastel-lavender-border transition">
+                    <input
+                      type="radio"
+                      name="engineMode"
+                      value="cloud-api"
+                      checked={engineMode === 'cloud-api'}
+                      onChange={() => {
+                        onChangeEngineMode?.('cloud-api');
+                        onToggleSimulated(false);
+                      }}
+                      className="text-[#7C66DC] focus:ring-[#7C66DC]"
+                    />
+                    <div>
+                      <div className="font-semibold">TypeSafe Cloud API</div>
+                      <div className="text-[10px] text-ink-500">Connects to remote high-capacity TypeSafe Jev System One endpoints.</div>
+                    </div>
                   </label>
                 </div>
               </div>

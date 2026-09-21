@@ -1,4 +1,113 @@
 import { HFDatasetMeta } from '../types';
+import { createDecisionEngine, type DecisionEngine } from 'webml-kit/browser';
+
+export type ExecutionEngine = 'simulated' | 'webml-kit' | 'cloud-api';
+
+let webmlKitEngine: DecisionEngine | null = null;
+let currentWebmlModel: string = 'qwen3-0.6b';
+
+export async function getWebMLKitEngine(model: string = 'qwen3-0.6b'): Promise<DecisionEngine> {
+  if (!webmlKitEngine || currentWebmlModel !== model) {
+    if (webmlKitEngine && typeof webmlKitEngine.dispose === 'function') {
+      try {
+        await webmlKitEngine.dispose();
+      } catch {
+        // Ignore cleanup error
+      }
+    }
+    webmlKitEngine = createDecisionEngine({
+      model: model as any,
+      mode: 'auto'
+    });
+    await webmlKitEngine.init();
+    currentWebmlModel = model;
+  }
+  return webmlKitEngine;
+}
+
+export async function evaluateRowWithWebMLKit(
+  state: any,
+  questions: Record<string, any>,
+  model: string = 'qwen3-0.6b'
+) {
+  const startTime = performance.now();
+  const engine = await getWebMLKitEngine(model);
+  const answers: Record<string, any> = {};
+
+  const stateStr = typeof state === 'string' ? state : JSON.stringify(state);
+  let totalInputTokens = Math.max(20, Math.floor(stateStr.length / 3.8));
+  let totalOutputTokens = 0;
+
+  for (const [qId, qDef] of Object.entries(questions)) {
+    const qType = qDef.type;
+    const instructions = typeof qDef.instructions === 'string'
+      ? qDef.instructions
+      : JSON.stringify(qDef.instructions || '');
+
+    if (qType === 'choice') {
+      const criteria = qDef.criteria || {};
+      const options = Object.keys(criteria).length >= 2
+        ? criteria
+        : (qDef.options && qDef.options.length >= 2 ? qDef.options : { positive: 'Positive', negative: 'Negative', neutral: 'Neutral' });
+
+      const res = await engine.choice({
+        state,
+        question: instructions,
+        options
+      });
+
+      answers[qId] = {
+        type: 'choice',
+        choice: res.choice,
+        probabilities: res.probabilities,
+        confidence: res.confidence
+      };
+      totalOutputTokens += 32;
+    } else if (qType === 'noul') {
+      const res = await engine.noul({
+        state,
+        statement: instructions,
+        threshold: 0.5
+      });
+
+      answers[qId] = {
+        type: 'noul',
+        noul: res.noul
+      };
+      totalOutputTokens += 18;
+    } else if (qType === 'score') {
+      const criteria = qDef.criteria || qDef.levels || ['Low', 'Moderate', 'High'];
+      const res = await engine.score({
+        state,
+        instructions,
+        criteria
+      });
+
+      answers[qId] = {
+        type: 'score',
+        score: res.score,
+        legend: qDef.legend || ['Low', 'Moderate', 'High'],
+        probabilities: res.probabilities,
+        confidence: res.confidence
+      };
+      totalOutputTokens += 24;
+    }
+  }
+
+  const latencyMs = Math.round(performance.now() - startTime);
+
+  return {
+    model: `webml-kit (${model})`,
+    answers,
+    usage: {
+      input_tokens: totalInputTokens,
+      output_tokens: totalOutputTokens
+    },
+    latencyMs,
+    isSimulated: false,
+    engine: 'webml-kit'
+  };
+}
 
 export function simulateJevEvaluation(state: any, questions: Record<string, any>) {
   const stateStr = typeof state === 'string' ? state.toLowerCase() : JSON.stringify(state).toLowerCase();
@@ -281,28 +390,46 @@ export async function evaluateRow(options: {
   model?: string;
   apiKey?: string;
   simulate?: boolean;
+  engine?: ExecutionEngine;
+  webmlModel?: string;
   signal?: AbortSignal;
 }) {
-  const { state, questions, model = 'jev-latest', apiKey, simulate = false, signal } = options;
+  const {
+    state,
+    questions,
+    model = 'jev-latest',
+    apiKey,
+    simulate = false,
+    engine = 'simulated',
+    webmlModel = 'qwen3-0.6b',
+    signal
+  } = options;
   const startTime = performance.now();
 
-  // Try local express endpoint first if not explicitly simulating
-  try {
-    const res = await fetch('/api/typesafe/evaluate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ state, questions, model, apiKey, simulate }),
-      signal
-    });
-    if (res.ok) {
-      return await res.json();
-    }
-  } catch {
-    // Fallback to client-side evaluation
+  // 1. webml-kit in-browser WebGPU execution
+  if (engine === 'webml-kit') {
+    return evaluateRowWithWebMLKit(state, questions, webmlModel);
   }
 
-  // Live direct API call if user entered API key
-  if (apiKey && !simulate) {
+  // Try local express endpoint first if not explicitly simulating
+  if (engine !== 'simulated' && !simulate) {
+    try {
+      const res = await fetch('/api/typesafe/evaluate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ state, questions, model, apiKey, simulate }),
+        signal
+      });
+      if (res.ok) {
+        return await res.json();
+      }
+    } catch {
+      // Fallback to client-side evaluation
+    }
+  }
+
+  // 2. Live direct API call if user entered API key
+  if ((engine === 'cloud-api' || !simulate) && apiKey) {
     const apiRes = await fetch('https://api.typesafe.ai/v1/systemone', {
       method: 'POST',
       headers: {
@@ -324,11 +451,12 @@ export async function evaluateRow(options: {
       answers: data.answers || {},
       usage: data.usage || { input_tokens: 0, output_tokens: 0 },
       latencyMs,
-      isSimulated: false
+      isSimulated: false,
+      engine: 'cloud-api'
     };
   }
 
-  // In-browser simulation
+  // 3. In-browser simulation
   await new Promise(r => setTimeout(r, 60));
   const sim = simulateJevEvaluation(state, questions);
   const latencyMs = Math.round(performance.now() - startTime);
@@ -336,6 +464,7 @@ export async function evaluateRow(options: {
   return {
     ...sim,
     latencyMs,
-    isSimulated: true
+    isSimulated: true,
+    engine: 'simulated'
   };
 }
