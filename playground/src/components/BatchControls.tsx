@@ -40,6 +40,7 @@ export const BatchControls: React.FC<BatchControlsProps> = ({
           <div className="flex flex-wrap items-center gap-2.5">
             {!isRunning ? (
               <button
+                data-testid="classify-button"
                 onClick={onStart}
                 disabled={activeDimensionCount === 0 || totalRows === 0}
                 className="inline-flex items-center gap-2 rounded-xl bg-[#4D3DB5] hover:bg-[#3D2FA0] px-5 py-2.5 text-xs font-semibold text-white shadow-soft-sm transition disabled:opacity-50"

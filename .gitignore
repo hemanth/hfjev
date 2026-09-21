@@ -35,3 +35,10 @@ yarn-error.log*
 .DS_Store
 .vscode/
 .idea/
+
+# Video Renders & Audio Scratch (NEVER push to git)
+renders/
+videos/
+*.mp4
+*.webm
+*.wav

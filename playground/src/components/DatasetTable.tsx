@@ -235,6 +235,7 @@ export const DatasetTable: React.FC<DatasetTableProps> = ({
                     <td className="py-3 px-3 text-right">
                       <div className="flex items-center justify-end gap-1.5">
                         <button
+                          data-testid="inspect-btn"
                           onClick={() => onInspectRow(rowItem)}
                           className="inline-flex items-center gap-1 rounded-lg border border-ink-200 bg-white px-2 py-1 text-[11px] font-medium text-ink-700 hover:bg-ink-50 transition shadow-soft-sm"
                           title="Deep Inspection"

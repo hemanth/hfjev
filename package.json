@@ -6,5 +6,23 @@
     "dev": "npm --prefix playground run dev",
     "build:playground": "npm --prefix playground run build && cp -r playground/dist/* docs/",
     "bench": "npm --prefix bench start"
-  }
+  },
+  "version": "1.0.0",
+  "description": "Classify Hugging Face datasets across typed semantic dimensions with TypeSafe Jev System One.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hemanth/hfjev.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/hemanth/hfjev/issues"
+  },
+  "homepage": "https://github.com/hemanth/hfjev#readme"
 }

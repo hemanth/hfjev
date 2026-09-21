@@ -22,6 +22,15 @@ export const RowInspectorModal: React.FC<RowInspectorModalProps> = ({
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState<'judgments' | 'json'>('judgments');
 
+  React.useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen || !row) return null;
 
   const evaluation = row.evaluation;
@@ -38,6 +47,8 @@ export const RowInspectorModal: React.FC<RowInspectorModalProps> = ({
       <div className="relative w-full max-w-2xl rounded-2xl bg-white p-6 shadow-soft-lg border border-ink-100 my-8">
         <button
           onClick={onClose}
+          aria-label="Close"
+          data-testid="modal-close"
           className="absolute right-4 top-4 rounded-lg p-1.5 text-ink-400 hover:bg-ink-100 hover:text-ink-700 transition"
         >
           <X size={18} />
