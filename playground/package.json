@@ -23,6 +23,7 @@
     "webml-kit": "^0.4.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/node": "^22.13.9",

@@ -4,3 +4,4 @@ dist
 *.log
 screenshot*.png
 .DS_Store
+test-results/
