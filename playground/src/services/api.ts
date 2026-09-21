@@ -15,12 +15,20 @@ export async function getWebMLKitEngine(model: string = 'qwen3-0.6b'): Promise<D
         // Ignore cleanup error
       }
     }
-    webmlKitEngine = createDecisionEngine({
-      model: model as any,
-      mode: 'auto'
-    });
-    await webmlKitEngine.init();
-    currentWebmlModel = model;
+    try {
+      webmlKitEngine = createDecisionEngine({
+        model: model as any,
+        modelUrl: 'https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/main/qwen2.5-0.5b-instruct-q4_k_m.gguf',
+        mode: 'auto'
+      });
+      await webmlKitEngine.init();
+      currentWebmlModel = model;
+    } catch (err) {
+      console.warn('WebML-Kit on-device model load failed or timed out, falling back to client heuristic engine:', err);
+      webmlKitEngine = createDecisionEngine({ mode: 'heuristic' });
+      await webmlKitEngine.init();
+      currentWebmlModel = 'heuristic';
+    }
   }
   return webmlKitEngine;
 }
